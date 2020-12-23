@@ -108,7 +108,7 @@ type Base64Vlq() =
     static member VlqDecode(stream : TextReader) = 
         let mutable result = 0
         let mutable shift = 0
-        let mutable (continuation : System.Boolean) = true
+        let mutable continuation = true
         let mutable (digit : int) = 0
         while continuation do
             if stream.Peek() = -1 then

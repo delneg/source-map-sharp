@@ -1,4 +1,5 @@
 namespace SourceMapSharp
+open System.Collections.Generic
 module Util =
     type MappingIndex = {line: int; column: int}
     type Mapping = {
@@ -18,7 +19,7 @@ module Util =
         else -1
     
     
-    let compareByGeneratedPositionsInflated(mappingA: Mapping, mappingB: Mapping) =
+    let compareByGeneratedPositionsInflated (mappingA: Mapping) (mappingB: Mapping) =
         let mutable cmp = mappingA.Generated.line - mappingB.Generated.line
         if cmp <> 0 then cmp
         else
@@ -37,3 +38,9 @@ module Util =
                         if cmp <> 0 then cmp
                         else strcmp mappingA.Name mappingB.Name
                 | _ -> strcmp mappingA.Name mappingB.Name
+
+
+    type MappingComparer() =
+      interface IComparer<Mapping> with
+        member _.Compare(a,b) = compareByGeneratedPositionsInflated a b
+        

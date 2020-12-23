@@ -9,6 +9,7 @@
     <ItemGroup>
         <Compile Include="Util.fs" />
         <Compile Include="ArraySet.fs" />
+        <Compile Include="MappingList.fs" />
         <Compile Include="Base64VLQ.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
