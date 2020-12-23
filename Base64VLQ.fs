@@ -1,4 +1,4 @@
-module source_map_sharp.Base64VLQ
+namespace SourceMapSharp
 
 open System
 open System.Collections.Generic

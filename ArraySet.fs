@@ -1,4 +1,4 @@
-module source_map_sharp.ArraySet
+namespace SourceMapSharp
 
 open System.Collections.Generic
 
