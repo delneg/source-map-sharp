@@ -5,7 +5,7 @@ open System.Collections.Generic
 open System.IO
 open System.Runtime.Serialization
 open System.Text
-open source_map_sharp
+
 // Original C# Code
 // https://github.com/madskristensen/WebEssentials2013/blob/96d37799/EditorExtensions/Shared/Helpers/Base64VLQ.cs
 [<Serializable>]

@@ -4,7 +4,7 @@ open System.Collections.Generic
 
 type ArraySet<'T when 'T : equality>() as this =
     member val _array = new ResizeArray<'T>()
-    member val _set = new Dictionary<'T,int>()
+    member val _set = Dictionary<'T,int>()
     
     member _.Size() = this._array.Count
     member _.Has(aStr:'T) =

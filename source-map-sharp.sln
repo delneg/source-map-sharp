@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "source-map-sharp", "source-map-sharp.fsproj", "{1D809047-0E41-4C6B-9191-CDCA18AD8B2C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "Tests\Tests.fsproj", "{404823EE-969B-4148-AE36-2BC09FE3C201}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{1D809047-0E41-4C6B-9191-CDCA18AD8B2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D809047-0E41-4C6B-9191-CDCA18AD8B2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D809047-0E41-4C6B-9191-CDCA18AD8B2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{404823EE-969B-4148-AE36-2BC09FE3C201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{404823EE-969B-4148-AE36-2BC09FE3C201}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{404823EE-969B-4148-AE36-2BC09FE3C201}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{404823EE-969B-4148-AE36-2BC09FE3C201}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

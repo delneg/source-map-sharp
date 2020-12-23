@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>source_map_sharp</RootNamespace>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SourceMapSharp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
