@@ -91,7 +91,10 @@ type Base64Vlq() =
         let mutable encoded = new StringBuilder()
         let mutable (digit : int) = Unchecked.defaultof<int>
         let mutable vlq = Base64Vlq.ToVLQSigned (number)
-        while vlq > 0 do
+        //isZeroCase is needed because F# doesn't have 'do {} while'
+        let mutable isZeroCase = number = 0
+        while vlq > 0 || isZeroCase do
+            isZeroCase <- false
             digit <- vlq &&& Base64Vlq.VLQ_BASE_MASK
             vlq <- vlq >>> Base64Vlq.VLQ_BASE_SHIFT
             if vlq > 0 then
