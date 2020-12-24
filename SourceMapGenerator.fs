@@ -30,6 +30,14 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
     member val _mappings = MappingList()
     member val _sourcesContents = Dictionary<string,string>()
     
+    //A mapping can have one of the three levels of data:
+    //  1. Just the generated position.
+    //  2. The Generated position, original position, and original source.
+    //  3. Generated and original position, original source, as well as a name
+    //    token.
+   
+    // To maintain consistency, we validate that any new mapping being added falls
+    // in to one of these categories.
 
     static member ValidateMapping(generated: MappingIndex,original: MappingIndex option,source: string option,name: string option) =
         //we don't need to check original.line & original.column === "number" because of F# type checks
@@ -123,8 +131,11 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
          sourcesContent=sourcesContent
          sourceRoot=this._sourceRoot}
         
+    //Render the source map being generated to a string.
     member _.toString() = JsonSerializer.Serialize(this.toJSON())
     
+    //Serialize the accumulated mappings in to the stream of base 64 VLQs
+    //specified by the source map format.
     member _.SerializeMappings() =
         let mutable previousGeneratedColumn = 0
         let mutable previousGeneratedLine = 1
