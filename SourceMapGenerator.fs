@@ -87,6 +87,22 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
                     None
             )
         
+    member _.SetSourceContent(aSourceFile, aSourceContent: string option) =
+        let mutable source = aSourceFile
+        if this._sourceRoot.IsSome then
+            source <- "" //TODO: util.relative(aSourceRoot, source);
+        if aSourceContent.IsSome then
+            // Add the source content to the _sourcesContents map.
+            // We don't need to create a new _sourceContents
+            // because it's always initialized
+            this._sourcesContents.[source] <- aSourceContent.Value
+        elif this._sourcesContents.Keys.Count > 0 then
+            // Remove the source file from the _sourcesContents map.
+            // We don't need to set _sourcesContents to null,
+            // because we only use `.Keys.Count` checks
+            this._sourcesContents.Remove(source) |> ignore
+        
+        
     member _.toJSON() =
         let version,sources,names,mappings = (SourceMapGenerator.version,
                                               this._sources.ToArray(),
