@@ -37,6 +37,15 @@ type SourceMapGenerator(?skipValidation:bool) as this=
                           (JsonSerializer.Serialize({|generated = generated;source=source;original=original;name=name|}))
             raise (System.Exception(err))
         
+    //
+   //Add a single mapping from original source line and column to the generated
+   //source's line and column for this source map being created. The mapping
+   //object should have the following properties:
+   //  - generated: An object with the generated line and column positions.
+   //  - original: An object with the original line and column positions.
+   //  - source: The original source file (relative to the sourceRoot).
+   //  - name: An optional original token name for this mapping.
+   //
     member _.AddMapping(generated: MappingIndex,?original: MappingIndex,?source: string,?name: string) =
         if not this._skipValidation then
             do SourceMapGenerator.ValidateMapping(generated,original,source,name)
@@ -64,6 +73,8 @@ type SourceMapGenerator(?skipValidation:bool) as this=
         let mutable sourceIdx  = 0
         let mappings = this._mappings.ToArray()
         for i in [0..mappings.Count - 1] do
+            //hack for 'continue' keyword in JS
+            let mutable shouldContinue = false
             let mapping = mappings.[i]
             next <- ""
             if mapping.Generated.line <> previousGeneratedLine then
@@ -73,36 +84,38 @@ type SourceMapGenerator(?skipValidation:bool) as this=
                     previousGeneratedLine <- previousGeneratedLine + 1
             elif i > 0 then
               if (compareByGeneratedPositionsInflated mapping mappings.[i-1]) = 0 then
-                  //TODO: continue ?
-                  ()
-              next <- next + "," 
-            next <- next + Base64Vlq.Encode (mapping.Generated.column - previousGeneratedColumn)
-            previousGeneratedColumn <- mapping.Generated.column
-            if mapping.Source.IsSome then
-                mapping.Source
-                |> Option.bind (fun x -> this._sources.indexOf x)
-                |> Option.iter (fun indexOfMappingSource ->
-                    sourceIdx <- indexOfMappingSource
-                    next <- next + Base64Vlq.Encode (sourceIdx - previousSource)
-                    previousSource <- sourceIdx
-                )
-                // lines are stored 0-based in SourceMap spec version 3
-                mapping.Original
-                |> Option.iter (fun original ->
-                    next <- next + Base64Vlq.Encode (original.line - 1 - previousOriginalLine)
-                    previousOriginalLine <- original.line - 1
-                    
-                    next <- next + Base64Vlq.Encode (original.column - 1 - previousOriginalColumn)
-                    previousOriginalColumn <- original.column - 1
-                )
-                
-                if mapping.Name.IsSome then
-                    mapping.Name
-                    |> Option.bind (fun x -> this._names.indexOf x)
-                    |> Option.iter (fun indexOfMappingName ->
-                        nameIdx <- indexOfMappingName
-                        next <- next + Base64Vlq.Encode (nameIdx - previousName)
-                        previousName <- nameIdx
+                  //JS has 'continue' here, which we're emulating with a mutable bool
+                  shouldContinue <- true
+              else
+                next <- next + ","
+            if not shouldContinue then
+                next <- next + Base64Vlq.Encode (mapping.Generated.column - previousGeneratedColumn)
+                previousGeneratedColumn <- mapping.Generated.column
+                if mapping.Source.IsSome then
+                    mapping.Source
+                    |> Option.bind (fun x -> this._sources.indexOf x)
+                    |> Option.iter (fun indexOfMappingSource ->
+                        sourceIdx <- indexOfMappingSource
+                        next <- next + Base64Vlq.Encode (sourceIdx - previousSource)
+                        previousSource <- sourceIdx
                     )
-            result <- result + next
+                    // lines are stored 0-based in SourceMap spec version 3
+                    mapping.Original
+                    |> Option.iter (fun original ->
+                        next <- next + Base64Vlq.Encode (original.line - 1 - previousOriginalLine)
+                        previousOriginalLine <- original.line - 1
+                        
+                        next <- next + Base64Vlq.Encode (original.column - 1 - previousOriginalColumn)
+                        previousOriginalColumn <- original.column - 1
+                    )
+                    
+                    if mapping.Name.IsSome then
+                        mapping.Name
+                        |> Option.bind (fun x -> this._names.indexOf x)
+                        |> Option.iter (fun indexOfMappingName ->
+                            nameIdx <- indexOfMappingName
+                            next <- next + Base64Vlq.Encode (nameIdx - previousName)
+                            previousName <- nameIdx
+                        )
+                result <- result + next
         result
