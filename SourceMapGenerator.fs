@@ -3,7 +3,15 @@ namespace SourceMapSharp
 open System.Collections.Generic
 open SourceMapSharp.Util
 
+open System.Text.Json
+open System.Text.Json.Serialization
+module SourceMapGenerator =
+    let setup() = 
+        let options = JsonSerializerOptions()
+        options.Converters.Add(JsonFSharpConverter())
 type SourceMapGenerator(?skipValidation:bool) as this=
+    
+    do SourceMapGenerator.setup()
     
 //    this._file = util.getArg(aArgs, "file", null);
 //    this._sourceRoot = util.getArg(aArgs, "sourceRoot", null);
@@ -13,6 +21,36 @@ type SourceMapGenerator(?skipValidation:bool) as this=
     member val _mappings = MappingList()
     member val _sourcesContents = Dictionary<string,string>()
 
+    static member ValidateMapping(generated: MappingIndex,original: MappingIndex option,source: string option,name: string option) =
+        //we don't need to check original.line & original.column === "number" because of F# type checks
+        let mutable isInvalid = true
+        if generated.line > 0 && generated.column >=0 && original.IsNone && source.IsNone && name.IsNone then
+            isInvalid <- false
+            
+        elif generated.line > 0 && generated.column >=0
+             && original.IsSome && original.Value.line > 0 && original.Value.column >= 0
+             && source.IsSome then
+             isInvalid <- false
+             
+        if isInvalid then
+            let err = sprintf "Invalid mapping: %s"
+                          (JsonSerializer.Serialize({|generated = generated;source=source;original=original;name=name|}))
+            raise (System.Exception(err))
+        
+    member _.AddMapping(generated: MappingIndex,?original: MappingIndex,?source: string,?name: string) =
+        if not this._skipValidation then
+            do SourceMapGenerator.ValidateMapping(generated,original,source,name)
+        
+        if source.IsSome then
+            if not (this._sources.Has(source.Value)) then
+              this._sources.Add(source.Value, false)
+        
+        if name.IsSome then
+            if not (this._names.Has(name.Value)) then
+              this._names.Add(name.Value, false)
+              
+        this._mappings.Add({Generated=generated;Original=original;Source=source;Name=name})
+        
     member _.SerializeMappings() =
         let mutable previousGeneratedColumn = 0
         let mutable previousGeneratedLine = 1
