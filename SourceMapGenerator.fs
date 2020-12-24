@@ -9,17 +9,27 @@ module SourceMapGenerator =
     let setup() = 
         let options = JsonSerializerOptions()
         options.Converters.Add(JsonFSharpConverter())
-type SourceMapGenerator(?skipValidation:bool) as this=
+        
+        
+ //An instance of the SourceMapGenerator represents a source map which is
+ //being built incrementally. You may pass an object with the following
+ //properties:
+ //  - file: The filename of the generated source.
+ //  - sourceRoot: A root for all relative URLs in this source map.
+ 
+type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as this=
     
     do SourceMapGenerator.setup()
     
-//    this._file = util.getArg(aArgs, "file", null);
-//    this._sourceRoot = util.getArg(aArgs, "sourceRoot", null);
+    static member version = 3
+    member val _file = file
+    member val _sourceRoot = sourceRoot
     member val _skipValidation = (skipValidation |> Option.defaultValue false) with get,set
     member val _sources = ArraySet()
     member val _names = ArraySet()
     member val _mappings = MappingList()
     member val _sourcesContents = Dictionary<string,string>()
+    
 
     static member ValidateMapping(generated: MappingIndex,original: MappingIndex option,source: string option,name: string option) =
         //we don't need to check original.line & original.column === "number" because of F# type checks
@@ -60,6 +70,45 @@ type SourceMapGenerator(?skipValidation:bool) as this=
               
         this._mappings.Add({Generated=generated;Original=original;Source=source;Name=name})
         
+    member _.GenerateSourcesContent(aSources, aSourceRoot: string option) =
+        aSources
+        |> Array.ofSeq
+        |> Seq.map (fun source ->
+            if this._sourcesContents.Keys.Count = 0 then
+                None
+            else
+                let mutable s = source
+                if aSourceRoot.IsSome then
+                    s <- "" //TODO: util.relative(aSourceRoot, source);
+                //don't need `util.toSetString(source)` in F#
+                if this._sourcesContents.ContainsKey(s) then
+                    Some <| this._sourcesContents.[s]
+                 else
+                    None
+            )
+        
+    member _.toJSON() =
+        let version,sources,names,mappings = (SourceMapGenerator.version,
+                                              this._sources.ToArray(),
+                                              this._names.ToArray(),
+                                              this.SerializeMappings()
+                                              )
+        let sourcesContent = 
+            if this._sourcesContents.Keys.Count > 0 then
+                Some(this.GenerateSourcesContent(sources,this._sourceRoot))
+            else
+                None
+                
+        {version=version
+         sources=sources
+         names=names
+         mappings=mappings
+         file=this._file
+         sourcesContent=sourcesContent
+         sourceRoot=this._sourceRoot}
+        
+    member _.toString() = JsonSerializer.Serialize(this.toJSON())
+    
     member _.SerializeMappings() =
         let mutable previousGeneratedColumn = 0
         let mutable previousGeneratedLine = 1

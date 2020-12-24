@@ -9,6 +9,16 @@ module Util =
         Name: string option
         
     }
+    
+    type SourceGeneratorJSON = {
+        version: int
+        sources: seq<string>
+        names: seq<string>
+        mappings: string
+        file: string option
+        sourcesContent: seq<string option> option
+        sourceRoot: string option
+    }
     let strcmp (s1: string option) (s2:string option) =
         if s1.IsSome && s2.IsSome then
             if s1 = s2 then 0
