@@ -1,7 +1,7 @@
 namespace SourceMapSharp
 
 open System.Text.RegularExpressions
-
+open System.Collections.Generic
 module SourceNode =
     let REGEX_NEWLINE = Regex @"(\r?\n)"
     let NEWLINE_CODE = 10
@@ -27,6 +27,7 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
     member val source = _source
     member val name = _name
     member val children = ResizeArray<SourceNodeChild>() with get,set
+    member val sourcesContents = Dictionary<string,string>()
 
     
     member _.Add(chunk: SourceChunk) : SourceNode =
@@ -62,3 +63,25 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
         let sb = System.Text.StringBuilder()
         this.Walk(fun s _ -> sb.Append(s) |> ignore)
         sb.ToString()
+
+    member _.ReplaceRight(pattern:string, replacement:string) =
+        let lastChild = this.children |> Seq.tryLast
+        match lastChild with
+        | Some (SN sn) -> sn.ReplaceRight(pattern, replacement)
+        | Some (S str) ->
+            this.children.[this.children.Count - 1] <- (str.Replace(pattern, replacement) |> S)
+            this
+        | None ->
+            this.children.Add("".Replace(pattern,replacement) |> S)
+            this
+    
+    member _.SetSourceContent(file,content) =
+        this.sourcesContents.[file] <- content
+    
+    member _.WalkSourceContents fn =
+        for child in this.children do
+            match child with
+            | SN sn -> sn.WalkSourceContents(fn)
+            | _ -> ()
+        this.sourcesContents |> Seq.iter (fun kvp -> fn(kvp.Key,kvp.Value))
+    
