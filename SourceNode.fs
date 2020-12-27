@@ -85,3 +85,52 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
             | _ -> ()
         this.sourcesContents |> Seq.iter (fun kvp -> fn(kvp.Key,kvp.Value))
     
+    member _.ToStringWithSourceMap(skipValidation:bool option,file:string option,sourceRoot:string option) =
+        let map = SourceMapGenerator(skipValidation,file,sourceRoot)
+        let mutable generatedCode = System.Text.StringBuilder()
+        let mutable generatedLine = 1
+        let mutable generatedColumn = 0
+        let mutable sourceMappingActive = false
+        let mutable lastOriginalSource = None
+        let mutable lastOriginalLine = None
+        let mutable lastOriginalColumn = None
+        let mutable lastOriginalName = None
+        this.Walk(fun chunk original ->
+            generatedCode.Append(chunk) |> ignore
+            if original.Source.IsSome && original.line.IsSome && original.column.IsSome then
+                if lastOriginalSource <> original.Source ||
+                   lastOriginalLine <> original.line ||
+                   lastOriginalColumn <> original.column ||
+                   lastOriginalName <> original.Name then
+                       let _generated: Util.MappingIndex = {line = generatedLine; column = generatedColumn}
+                       let _original: Util.MappingIndex = {line = original.line.Value; column = original.column.Value}
+                       map.AddMapping(_generated, Some _original, original.Source,original.Name)
+                lastOriginalSource <- original.Source
+                lastOriginalLine <- original.line
+                lastOriginalColumn <- original.column
+                lastOriginalName <- original.Name
+                sourceMappingActive <- true
+            elif sourceMappingActive then
+                let _generated: Util.MappingIndex = {line = generatedLine; column = generatedColumn}
+                map.AddMapping(_generated, None,None,None)
+                lastOriginalSource <- None
+                sourceMappingActive <- false
+            
+            for idx in [0..chunk.Length-1] do
+                if int chunk.[idx] = SourceNode.NEWLINE_CODE then
+                    generatedLine <- generatedLine + 1
+                    generatedColumn <- 0
+                    // Mappings end at eol
+                    if idx + 1 = chunk.Length then
+                        lastOriginalSource <- None
+                        sourceMappingActive <- false
+                    elif sourceMappingActive then
+                        let _generated: Util.MappingIndex = {line = generatedLine; column = generatedColumn}
+                        let _original: Util.MappingIndex = {line = original.line.Value; column = original.column.Value}
+                        map.AddMapping(_generated, Some _original, original.Source,original.Name)
+                else
+                    generatedColumn <- generatedColumn + 1
+            )
+        this.WalkSourceContents(fun (file,content) -> map.SetSourceContent(file,Some content))
+        (generatedCode.ToString(), map)
+        

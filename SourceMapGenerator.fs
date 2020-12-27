@@ -17,7 +17,7 @@ module SourceMapGenerator =
  //  - file: The filename of the generated source.
  //  - sourceRoot: A root for all relative URLs in this source map.
  
-type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as this=
+type SourceMapGenerator(skipValidation:bool option,file:string option,sourceRoot:string option) as this=
     
     do SourceMapGenerator.setup()
     
@@ -64,7 +64,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
    //  - source: The original source file (relative to the sourceRoot).
    //  - name: An optional original token name for this mapping.
    //
-    member _.AddMapping(generated: MappingIndex,?original: MappingIndex,?source: string,?name: string) =
+    member _.AddMapping(generated: MappingIndex,original: MappingIndex option,source: string option,name: string option) =
         if not this._skipValidation then
             do SourceMapGenerator.ValidateMapping(generated,original,source,name)
         
