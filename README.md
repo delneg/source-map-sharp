@@ -1,8 +1,10 @@
-### Source Map Sharp
+# Source Map Sharp
 
 ## About
 
-This is a direct rewrite (meaning, the goal was not to write 'idiomatic' F# code, but to resemble inital JS code as close as possible)
+This is a direct rewrite (meaning, the goal was not to write 'idiomatic' F# code, but to resemble inital JS code as close as possible) of source map generation tool https://github.com/mozilla/source-map
+
+Which is originally written in JS. The initial purpose is to use it with https://github.com/fable-compiler/Fable project
 
 ### Files - status
 
