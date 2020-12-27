@@ -6,6 +6,8 @@ This is a direct rewrite (meaning, the goal was not to write 'idiomatic' F# code
 
 Which is originally written in JS. The initial purpose is to use it with https://github.com/fable-compiler/Fable project
 
+
+See https://github.com/fable-compiler/Fable/issues/2166 - "Bring back source map support"
 ### Files - status
 
 1. `ArraySet` - Done & tested
