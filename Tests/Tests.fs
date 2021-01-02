@@ -4,6 +4,7 @@ open System
 open SourceMapSharp
 open Xunit
 open System.Text.Json
+open SourceMapSharp.Util
 module Base64Tests =
     [<Fact>]
     let ``Base64 encode test out of range encoding`` () =
@@ -707,90 +708,143 @@ module SourceMapGeneratorTests =
     [<Fact>]
     let ``test adding mappings (case 1)`` () =
         let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
-        let generated: Util.MappingIndex = {line=1;column=1}
+        let generated: MappingIndex = {line=1;column=1}
         map.AddMapping(generated)
         
     [<Fact>]
     let ``test adding mappings (case 2)`` () =
         let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
-        let generated: Util.MappingIndex = {line=1;column=1}
-        let original: Util.MappingIndex = {line=1;column=1}
+        let generated: MappingIndex = {line=1;column=1}
+        let original: MappingIndex = {line=1;column=1}
         map.AddMapping(generated,original,"bar.js")
         
     [<Fact>]
     let ``test adding mappings (case 3)`` () =
         let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
-        let generated: Util.MappingIndex = {line=1;column=1}
-        let original: Util.MappingIndex = {line=1;column=1}
+        let generated: MappingIndex = {line=1;column=1}
+        let original: MappingIndex = {line=1;column=1}
         map.AddMapping(generated,original,"bar.js","someToken")
     
     [<Fact>]
     let ``test adding mappings (invalid)`` () =
         let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
-        let generated: Util.MappingIndex = {line=1;column=1}
-        let original: Util.MappingIndex = {line=1;column=1}
+        let generated: MappingIndex = {line=1;column=1}
+        let original: MappingIndex = {line=1;column=1}
         Assert.Throws(Exception().GetType(),Action(fun _ -> map.AddMapping(generated,original)))
     
     [<Fact>]
     let ``test adding mappings with skipValidation`` () =
         let map = SourceMapGenerator(skipValidation=true, file="generated-foo.js",sourceRoot=".")
-        let generated: Util.MappingIndex = {line=1;column=1}
-        let original: Util.MappingIndex = {line=1;column=1}
+        let generated: MappingIndex = {line=1;column=1}
+        let original: MappingIndex = {line=1;column=1}
         map.AddMapping(generated,original)
         
     [<Fact>]
     let ``test that the correct mappings are being generated`` () =
         let map = SourceMapGenerator(file="min.js",sourceRoot="/the/root")
-        let generated: Util.MappingIndex = { line= 1; column= 1 }
-        let original: Util.MappingIndex = { line= 1; column= 1 }
+        let generated: MappingIndex = { line= 1; column= 1 }
+        let original: MappingIndex = { line= 1; column= 1 }
         map.AddMapping(generated, original, "one.js")
 
-        let generated: Util.MappingIndex = { line= 1; column= 5 }
-        let original: Util.MappingIndex = { line= 1; column= 5 }
+        let generated: MappingIndex = { line= 1; column= 5 }
+        let original: MappingIndex = { line= 1; column= 5 }
         map.AddMapping(generated, original, "one.js")
 
-        let generated: Util.MappingIndex = { line= 1; column= 9 }
-        let original: Util.MappingIndex = { line= 1; column= 11 }
+        let generated: MappingIndex = { line= 1; column= 9 }
+        let original: MappingIndex = { line= 1; column= 11 }
         map.AddMapping(generated, original, "one.js")
 
-        let generated: Util.MappingIndex = { line= 1; column= 18 }
-        let original: Util.MappingIndex = { line= 1; column= 21 }
+        let generated: MappingIndex = { line= 1; column= 18 }
+        let original: MappingIndex = { line= 1; column= 21 }
         map.AddMapping(generated, original, "one.js", "bar")
 
-        let generated: Util.MappingIndex = { line= 1; column= 21 }
-        let original: Util.MappingIndex = { line= 2; column= 3 }
+        let generated: MappingIndex = { line= 1; column= 21 }
+        let original: MappingIndex = { line= 2; column= 3 }
         map.AddMapping(generated, original, "one.js")
 
-        let generated: Util.MappingIndex = { line= 1; column= 28 }
-        let original: Util.MappingIndex = { line= 2; column= 10 }
+        let generated: MappingIndex = { line= 1; column= 28 }
+        let original: MappingIndex = { line= 2; column= 10 }
         map.AddMapping(generated, original, "one.js", "baz")
 
-        let generated: Util.MappingIndex = { line= 1; column= 32 }
-        let original: Util.MappingIndex = { line= 2; column= 14 }
+        let generated: MappingIndex = { line= 1; column= 32 }
+        let original: MappingIndex = { line= 2; column= 14 }
         map.AddMapping(generated, original, "one.js", "bar")
 
-        let generated: Util.MappingIndex = { line= 2; column= 1 }
-        let original: Util.MappingIndex = { line= 1; column= 1 }
+        let generated: MappingIndex = { line= 2; column= 1 }
+        let original: MappingIndex = { line= 1; column= 1 }
         map.AddMapping(generated, original, "two.js")
 
-        let generated: Util.MappingIndex = { line= 2; column= 5 }
-        let original: Util.MappingIndex = { line= 1; column= 5 }
+        let generated: MappingIndex = { line= 2; column= 5 }
+        let original: MappingIndex = { line= 1; column= 5 }
         map.AddMapping(generated, original, "two.js")
 
-        let generated: Util.MappingIndex = { line= 2; column= 9 }
-        let original: Util.MappingIndex = { line= 1; column= 11 }
+        let generated: MappingIndex = { line= 2; column= 9 }
+        let original: MappingIndex = { line= 1; column= 11 }
         map.AddMapping(generated, original, "two.js")
 
-        let generated: Util.MappingIndex = { line= 2; column= 18 }
-        let original: Util.MappingIndex = { line= 1; column= 21 }
+        let generated: MappingIndex = { line= 2; column= 18 }
+        let original: MappingIndex = { line= 1; column= 21 }
         map.AddMapping(generated, original, "two.js", "n")
 
-        let generated: Util.MappingIndex = { line= 2; column= 21 }
-        let original: Util.MappingIndex = { line= 2; column= 3 }
+        let generated: MappingIndex = { line= 2; column= 21 }
+        let original: MappingIndex = { line= 2; column= 3 }
         map.AddMapping(generated, original, "two.js")
 
-        let generated: Util.MappingIndex = { line= 2; column= 28 }
-        let original: Util.MappingIndex = { line= 2; column= 10 }
+        let generated: MappingIndex = { line= 2; column= 28 }
+        let original: MappingIndex = { line= 2; column= 10 }
         map.AddMapping(generated, original, "two.js", "n")
         
         Assert.Equal (map.ToString(),JsonSerializer.Serialize(testMap))
+        
+    [<Fact>]
+    let ``test that adding a mapping with an empty string name does not break generation`` () =
+        let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
+        let generated: MappingIndex = {line=1;column=1}
+        let original: MappingIndex = {line=1;column=1}
+        map.AddMapping(generated,original, source="bar.js",name="")
+        map.ToString()
+    
+    [<Fact>]
+    let ``test that source content can be set`` () =
+        let map = SourceMapGenerator(file="min.js",sourceRoot="/the/root")
+        let generated: MappingIndex = { line= 1; column= 1 }
+        let original: MappingIndex = { line= 1; column= 1 }
+        map.AddMapping(generated, original, "one.js")
+        let generated: MappingIndex = { line= 2; column= 1 }
+        let original: MappingIndex = { line= 1; column= 1 }
+        map.AddMapping(generated, original, "two.js")
+        map.SetSourceContent("one.js",Some "one file content")
+        let j = map.toJSON()
+        let _src = j.sources |> Array.ofSeq
+        let _srcC = j.sourcesContent.Value |> Array.ofSeq
+        printfn "sources:%A, sourcesContent: %A" _src _srcC
+        Assert.True (_src.[0] = "one.js")
+        Assert.True (_src.[1] = "two.js")
+        Assert.True(_srcC.[0].Value = "one file content")
+        Assert.True(_srcC.[1].IsNone)
+    [<Fact>]
+    let ``test sorting with duplicate generated mappings`` () =
+        let map = SourceMapGenerator(file="test.js")
+        let generated1: MappingIndex = { line= 3; column= 0 }
+        let original1: MappingIndex = { line= 2; column= 0 }
+        map.AddMapping(generated1, original1, "a.js")
+
+        let generated2: MappingIndex = { line= 2; column= 0 }
+        map.AddMapping(generated2)
+
+        let generated3: MappingIndex = { line= 2; column= 0 }
+        map.AddMapping(generated3)
+
+        let generated4: MappingIndex = { line= 1; column= 0 }
+        let original4: MappingIndex = { line= 1; column= 0 }
+        map.AddMapping(generated4, original4, "a.js")
+        let expected = {
+             version=3
+             file="test.js"|>Some
+             sources= seq {"a.js"}
+             names= Seq.empty
+             mappings="AAAA;A;AACA"
+             sourcesContent=None
+             sourceRoot=None
+            }
+        Assert.Equal (map.ToString(),JsonSerializer.Serialize(expected))
