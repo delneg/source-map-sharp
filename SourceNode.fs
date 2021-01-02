@@ -106,8 +106,17 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
     
     // Returns the string representation of this source node along with a source
     // map.
-    member _.ToStringWithSourceMap(skipValidation:bool option,file:string option,sourceRoot:string option) =
-        let map = SourceMapGenerator(skipValidation,file,sourceRoot)
+    member _.ToStringWithSourceMap(?skipValidation:bool,?file:string,?sourceRoot:string) =
+        let map =
+            match (skipValidation,file,sourceRoot) with
+            | Some x, Some y, Some z -> SourceMapGenerator(x, y, z)
+            | Some x, Some y, None -> SourceMapGenerator(skipValidation = x,file = y)
+            | Some x, None, Some z -> SourceMapGenerator(skipValidation = x, sourceRoot = z)
+            | None, Some y, Some z  -> SourceMapGenerator(file = y, sourceRoot = z)
+            | None, Some y, None -> SourceMapGenerator (file = y)
+            | Some x, None, None -> SourceMapGenerator(skipValidation = x)
+            | None, None, Some z -> SourceMapGenerator(sourceRoot = z)
+            | None, None, None -> SourceMapGenerator()
         let mutable generatedCode = System.Text.StringBuilder()
         let mutable generatedLine = 1
         let mutable generatedColumn = 0

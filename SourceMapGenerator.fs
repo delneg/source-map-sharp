@@ -17,7 +17,7 @@ module SourceMapGenerator =
  //  - file: The filename of the generated source.
  //  - sourceRoot: A root for all relative URLs in this source map.
  
-type SourceMapGenerator(skipValidation:bool option,file:string option,sourceRoot:string option) as this=
+type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as this=
     
     do SourceMapGenerator.setup()
     
