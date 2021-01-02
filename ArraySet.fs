@@ -6,7 +6,7 @@ type ArraySet<'T when 'T : equality>() as this =
     member val _array = new ResizeArray<'T>()
     member val _set = Dictionary<'T,int>()
     
-    member _.Size() = this._array.Count
+    member _.Size() = this._set.Count
     member _.Has(aStr:'T) =
         this._set.ContainsKey(aStr)
     member _.indexOf(aStr: 'T) =

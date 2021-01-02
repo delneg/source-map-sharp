@@ -676,8 +676,7 @@ module ArraySetTests =
         set.Add("bar",true)
         set.Add("baz",false)
         set.Add("baz",true)
-        // looks like JS tests have a bug here, should be 6
-        Assert.StrictEqual(set.Size(), 6)
+        Assert.StrictEqual(set.Size(), 3)
 
 module SourceMapGeneratorTests =
     let testMap: Util.SourceGeneratorJSON = {
