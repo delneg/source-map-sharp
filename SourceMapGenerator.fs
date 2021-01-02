@@ -181,8 +181,8 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
                         next <- next + Base64Vlq.Encode (original.line - 1 - previousOriginalLine)
                         previousOriginalLine <- original.line - 1
                         
-                        next <- next + Base64Vlq.Encode (original.column - 1 - previousOriginalColumn)
-                        previousOriginalColumn <- original.column - 1
+                        next <- next + Base64Vlq.Encode (original.column - previousOriginalColumn)
+                        previousOriginalColumn <- original.column
                     )
                     
                     if mapping.Name.IsSome then

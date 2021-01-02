@@ -793,9 +793,4 @@ module SourceMapGeneratorTests =
         let original: Util.MappingIndex = { line= 2; column= 10 }
         map.AddMapping(generated, original, "two.js", "n")
         
-        printfn "%s\n%s" (map.ToString()) (JsonSerializer.Serialize(testMap))
-        
-        
-        //TODO: expected: "CAAC,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA"
-        // actual:  "CAAA,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA"
         Assert.Equal (map.ToString(),JsonSerializer.Serialize(testMap))
