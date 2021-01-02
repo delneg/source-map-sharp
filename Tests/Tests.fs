@@ -678,3 +678,54 @@ module ArraySetTests =
         set.Add("baz",true)
         // looks like JS tests have a bug here, should be 6
         Assert.StrictEqual(set.Size(), 6)
+
+module SourceMapGeneratorTests =
+    [<Fact>]
+    let ``test some simple stuff`` () =
+        let map = SourceMapGenerator(file="foo.js",sourceRoot=".").toJSON()        
+        Assert.True map.file.IsSome
+        Assert.True map.sourceRoot.IsSome
+        let map = SourceMapGenerator().toJSON()
+        Assert.True map.file.IsNone
+        Assert.True map.sourceRoot.IsNone
+    
+    [<Fact>]
+    let ``test  JSON serialization`` () =
+        let map = SourceMapGenerator(file="foo.js",sourceRoot=".")
+        let s = map.ToString()
+        Assert.NotNull s
+        
+    [<Fact>]
+    let ``test adding mappings (case 1)`` () =
+        let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
+        let generated: Util.MappingIndex = {line=1;column=1}
+        map.AddMapping(generated)
+        
+    [<Fact>]
+    let ``test adding mappings (case 2)`` () =
+        let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
+        let generated: Util.MappingIndex = {line=1;column=1}
+        let original: Util.MappingIndex = {line=1;column=1}
+        map.AddMapping(generated,original,"bar.js")
+        
+    [<Fact>]
+    let ``test adding mappings (case 3)`` () =
+        let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
+        let generated: Util.MappingIndex = {line=1;column=1}
+        let original: Util.MappingIndex = {line=1;column=1}
+        map.AddMapping(generated,original,"bar.js","someToken")
+    
+    [<Fact>]
+    let ``test adding mappings (invalid)`` () =
+        let map = SourceMapGenerator(file="generated-foo.js",sourceRoot=".")
+        let generated: Util.MappingIndex = {line=1;column=1}
+        let original: Util.MappingIndex = {line=1;column=1}
+        Assert.Throws(Exception().GetType(),Action(fun _ -> map.AddMapping(generated,original)))
+    
+    [<Fact>]
+    let ``test adding mappings with skipValidation`` () =
+        let map = SourceMapGenerator(skipValidation=true, file="generated-foo.js",sourceRoot=".")
+        let generated: Util.MappingIndex = {line=1;column=1}
+        let original: Util.MappingIndex = {line=1;column=1}
+        map.AddMapping(generated,original)
+        
