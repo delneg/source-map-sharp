@@ -159,7 +159,8 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
                     next <- next + ";"
                     previousGeneratedLine <- previousGeneratedLine + 1
             elif i > 0 then
-              if (compareByGeneratedPositionsInflated mapping mappings.[i-1]) = 0 then
+              let compared = compareByGeneratedPositionsInflated mapping mappings.[i-1]
+              if compared = 0 then
                   //JS has 'continue' here, which we're emulating with a mutable bool
                   shouldContinue <- true
               else

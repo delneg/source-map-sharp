@@ -24,6 +24,8 @@ module Util =
             if s1 = s2 then 0
             elif s1 > s2 then 1
             else -1
+        elif s1.IsNone && s2.IsNone then
+            0
         elif s1.IsNone then 1
         elif s2.IsNone then -1
         else -1
