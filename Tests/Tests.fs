@@ -3,7 +3,7 @@ module Tests
 open System
 open SourceMapSharp
 open Xunit
-
+open System.Text.Json
 module Base64Tests =
     [<Fact>]
     let ``Base64 encode test out of range encoding`` () =
@@ -680,6 +680,16 @@ module ArraySetTests =
         Assert.StrictEqual(set.Size(), 6)
 
 module SourceMapGeneratorTests =
+    let testMap: Util.SourceGeneratorJSON = {
+     version=3
+     file="min.js"|>Some
+     sources= seq {"one.js";"two.js"}
+     names=seq {"bar";"baz";"n"}
+     mappings="CAAC,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA"
+     sourcesContent=None
+     sourceRoot="/the/root"|>Some
+    }
+    
     [<Fact>]
     let ``test some simple stuff`` () =
         let map = SourceMapGenerator(file="foo.js",sourceRoot=".").toJSON()        
@@ -729,3 +739,64 @@ module SourceMapGeneratorTests =
         let original: Util.MappingIndex = {line=1;column=1}
         map.AddMapping(generated,original)
         
+    [<Fact>]
+    let ``test that the correct mappings are being generated`` () =
+        let map = SourceMapGenerator(file="min.js",sourceRoot="/the/root")
+        let generated: Util.MappingIndex = { line= 1; column= 1 }
+        let original: Util.MappingIndex = { line= 1; column= 1 }
+        map.AddMapping(generated, original, "one.js")
+
+        let generated: Util.MappingIndex = { line= 1; column= 5 }
+        let original: Util.MappingIndex = { line= 1; column= 5 }
+        map.AddMapping(generated, original, "one.js")
+
+        let generated: Util.MappingIndex = { line= 1; column= 9 }
+        let original: Util.MappingIndex = { line= 1; column= 11 }
+        map.AddMapping(generated, original, "one.js")
+
+        let generated: Util.MappingIndex = { line= 1; column= 18 }
+        let original: Util.MappingIndex = { line= 1; column= 21 }
+        map.AddMapping(generated, original, "one.js", "bar")
+
+        let generated: Util.MappingIndex = { line= 1; column= 21 }
+        let original: Util.MappingIndex = { line= 2; column= 3 }
+        map.AddMapping(generated, original, "one.js")
+
+        let generated: Util.MappingIndex = { line= 1; column= 28 }
+        let original: Util.MappingIndex = { line= 2; column= 10 }
+        map.AddMapping(generated, original, "one.js", "baz")
+
+        let generated: Util.MappingIndex = { line= 1; column= 32 }
+        let original: Util.MappingIndex = { line= 2; column= 14 }
+        map.AddMapping(generated, original, "one.js", "bar")
+
+        let generated: Util.MappingIndex = { line= 2; column= 1 }
+        let original: Util.MappingIndex = { line= 1; column= 1 }
+        map.AddMapping(generated, original, "two.js")
+
+        let generated: Util.MappingIndex = { line= 2; column= 5 }
+        let original: Util.MappingIndex = { line= 1; column= 5 }
+        map.AddMapping(generated, original, "two.js")
+
+        let generated: Util.MappingIndex = { line= 2; column= 9 }
+        let original: Util.MappingIndex = { line= 1; column= 11 }
+        map.AddMapping(generated, original, "two.js")
+
+        let generated: Util.MappingIndex = { line= 2; column= 18 }
+        let original: Util.MappingIndex = { line= 1; column= 21 }
+        map.AddMapping(generated, original, "two.js", "n")
+
+        let generated: Util.MappingIndex = { line= 2; column= 21 }
+        let original: Util.MappingIndex = { line= 2; column= 3 }
+        map.AddMapping(generated, original, "two.js")
+
+        let generated: Util.MappingIndex = { line= 2; column= 28 }
+        let original: Util.MappingIndex = { line= 2; column= 10 }
+        map.AddMapping(generated, original, "two.js", "n")
+        
+        printfn "%s\n%s" (map.ToString()) (JsonSerializer.Serialize(testMap))
+        
+        
+        //TODO: expected: "CAAC,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA"
+        // actual:  "CAAA,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA"
+        Assert.Equal (map.ToString(),JsonSerializer.Serialize(testMap))
