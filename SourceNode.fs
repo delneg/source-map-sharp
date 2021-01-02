@@ -134,7 +134,9 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
                    lastOriginalName <> original.Name then
                        let _generated: Util.MappingIndex = {line = generatedLine; column = generatedColumn}
                        let _original: Util.MappingIndex = {line = original.line.Value; column = original.column.Value}
-                       map.AddMapping(_generated, Some _original, original.Source,original.Name)
+                       match original.Name with
+                       | Some n -> map.AddMapping(_generated, _original, original.Source.Value, n)
+                       | None -> map.AddMapping(_generated, _original, original.Source.Value)
                 lastOriginalSource <- original.Source
                 lastOriginalLine <- original.line
                 lastOriginalColumn <- original.column
@@ -142,7 +144,7 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
                 sourceMappingActive <- true
             elif sourceMappingActive then
                 let _generated: Util.MappingIndex = {line = generatedLine; column = generatedColumn}
-                map.AddMapping(_generated, None,None,None)
+                map.AddMapping(_generated)
                 lastOriginalSource <- None
                 sourceMappingActive <- false
             
@@ -157,7 +159,12 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
                     elif sourceMappingActive then
                         let _generated: Util.MappingIndex = {line = generatedLine; column = generatedColumn}
                         let _original: Util.MappingIndex = {line = original.line.Value; column = original.column.Value}
-                        map.AddMapping(_generated, Some _original, original.Source,original.Name)
+                        match original.Source,original.Name with
+                        | Some src, Some name -> map.AddMapping(_generated, _original, src,name)
+                        | Some src, None -> map.AddMapping(_generated, _original, src)
+                        | None, Some name -> map.AddMapping(_generated, _original, name=name)
+                        | None, None -> map.AddMapping(_generated, _original)
+                        
                 else
                     generatedColumn <- generatedColumn + 1
             )

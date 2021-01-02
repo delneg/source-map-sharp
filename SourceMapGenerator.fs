@@ -64,7 +64,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
    //  - source: The original source file (relative to the sourceRoot).
    //  - name: An optional original token name for this mapping.
    //
-    member _.AddMapping(generated: MappingIndex,original: MappingIndex option,source: string option,name: string option) =
+    member _.AddMapping(generated: MappingIndex,?original: MappingIndex,?source: string,?name: string) =
         if not this._skipValidation then
             do SourceMapGenerator.ValidateMapping(generated,original,source,name)
         
@@ -132,7 +132,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
          sourceRoot=this._sourceRoot}
         
     //Render the source map being generated to a string.
-    member _.toString() = JsonSerializer.Serialize(this.toJSON())
+    override _.ToString() = JsonSerializer.Serialize(this.toJSON())
     
     //Serialize the accumulated mappings in to the stream of base 64 VLQs
     //specified by the source map format.
