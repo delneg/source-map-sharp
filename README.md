@@ -19,8 +19,8 @@ See https://github.com/fable-compiler/Fable/issues/2166 - "Bring back source map
 7. `read-wasm-browser` - Not done, probably won't need
 8. `read-wasm` - Not done, probably won't need
 9. `source-map-consumer` - Not done, Don't know if will need it or not at the moment
-10. `source-map-generator` - Done except the `consumer` parts, not tested
-11. `source-node` - Done  except the `consumer` parts, not tested
+10. `source-map-generator` - Done except the `consumer` parts, tested except `consumer` parts
+11. `source-node` - Done except the `consumer` parts, not tested
 12. `url-browser` - Not done, probably won't need
 13. `url` - Not done, need help
 14. `util` - Done partially, only what's needed, `url`-related stuff not done
