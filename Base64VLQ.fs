@@ -11,15 +11,15 @@ open System.Text
 [<Serializable>]
 type VlqException() =
     inherit Exception()
-    new(message : string) as this = 
+    new(message : string) = 
         (VlqException ())
         then
             ()
-    new(message : string, innerException : Exception) as this = 
+    new(message : string, innerException : Exception) = 
         (VlqException ())
         then
             ()
-    new(info : SerializationInfo, context : StreamingContext) as this = 
+    new(info : SerializationInfo, context : StreamingContext) = 
         (VlqException ())
         then
             ()
