@@ -87,7 +87,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
             else
                 let mutable s = source
                 if aSourceRoot.IsSome then
-                    s <- "" //TODO: util.relative(aSourceRoot, source);
+                    s <- sprintf "%s/%s" this._sourceRoot.Value source //TODO: util.relative(aSourceRoot, source);
                 //don't need `util.toSetString(source)` in F#
                 if this._sourcesContents.ContainsKey(s) then
                     Some <| this._sourcesContents.[s]
@@ -98,7 +98,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
     member _.SetSourceContent(aSourceFile, aSourceContent: string option) =
         let mutable source = aSourceFile
         if this._sourceRoot.IsSome then
-            source <- "" //TODO: util.relative(aSourceRoot, source);
+            source <- sprintf "%s/%s" this._sourceRoot.Value source //TODO: util.relative(aSourceRoot, source);
         if aSourceContent.IsSome then
             // Add the source content to the _sourcesContents map.
             // We don't need to create a new _sourceContents
