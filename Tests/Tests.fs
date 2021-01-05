@@ -1103,3 +1103,30 @@ module SourceNodeTests =
         Assert.Equal(snd results.[0], "someContent")
         Assert.Equal(fst results.[1], "b.js")
         Assert.Equal(snd results.[1], "otherContent")
+        
+    [<Fact>]
+    let ``test setSourceContent with toStringWithSourceMap`` () =
+        let aNode = SourceNode(_line=1,_column=1,_source="a.js",_chunks=[|SourceChunk.ChunkS "a"|])
+        aNode.SetSourceContent("a.js","someContent")
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "(function () {\n"
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [| aNode |]
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [|
+                SourceNode(_line=1,_column=1,_source="b.js",_chunks=[|SourceChunk.ChunkS "b"|])
+            |]
+            SourceChunk.ChunkS "}());"
+        |])
+        node.SetSourceContent("b.js","otherContent")
+        let (_, map) = node.ToStringWithSourceMap(file="foo.js")
+        Assert.NotNull(map) //dummy assert
+        
+        Assert.Equal(map._sources.Size(), 2)
+        Assert.Equal(map._sources.At(0).Value, "a.js");
+        Assert.Equal(map._sources.At(1).Value, "b.js");
+        Assert.Equal(map._sourcesContents.Count, 2)
+        let sc = map._sourcesContents |> Seq.map (fun kvp -> kvp.Value) |> Array.ofSeq
+        Assert.Equal(sc.[0], "someContent");
+        Assert.Equal(sc.[1], "otherContent");
+        
