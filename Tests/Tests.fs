@@ -817,7 +817,6 @@ module SourceMapGeneratorTests =
         let j = map.toJSON()
         let _src = j.sources |> Array.ofSeq
         let _srcC = j.sourcesContent.Value |> Array.ofSeq
-        printfn "sources:%A, sourcesContent: %A" _src _srcC
         Assert.True (_src.[0] = "one.js")
         Assert.True (_src.[1] = "two.js")
         Assert.True(_srcC.[0].Value = "one file content")
@@ -961,4 +960,58 @@ module SourceMapGeneratorTests =
         let m = map.toJSON()
         Assert.Equal(m.names |> Seq.length,1)
         Assert.Equal(m.names |> Seq.head,"8")
-       
+
+module SourceNodeTests =
+    [<Fact>]
+    let ``test .add()`` () =
+        let node = SourceNode()
+        node.Add(SourceChunk.ChunkS "function noop() {}") |> ignore
+        node.Add(SourceChunk.ChunkArrSN [|SourceNode()|]) |> ignore
+        node.Add(SourceChunk.ChunkArrSN [|SourceNode(_chunks=[|SourceChunk.ChunkS "return 10;"|])|]) |> ignore
+        node.Add(SourceChunk.ChunkArrS [|"function foo() {";"}"|]) |> ignore
+    [<Fact>]
+    let ``test .prepend()`` () =
+        let node = SourceNode()
+        let s = "function noop() {}"
+        node.Prepend(SourceChunk.ChunkS s) |> ignore
+        Assert.Equal(node.children.[0],SourceNodeChild.S s)
+        Assert.Equal(node.children.Count,1)
+        
+        node.Prepend(SourceChunk.ChunkArrSN [|SourceNode()|]) |> ignore
+        Assert.True(match node.children.[0] with | SN _ -> true | S _ -> false)
+        Assert.True(match node.children.[1] with | SN _ -> false | S _ -> true)
+        Assert.True(match node.children.[1] with | SN _ -> false | S ss -> s = ss)
+        Assert.True(node.children.Count = 2)
+        
+        node.Prepend(
+            [|SourceChunk.ChunkS "function foo() {"
+              SourceChunk.ChunkArrSN [|SourceNode(_chunks=[|SourceChunk.ChunkS "return 10;"|])|]
+              SourceChunk.ChunkS "}"
+            |]) |> ignore
+
+        Assert.Equal(node.children.[0].ToString(), "function foo() {")
+        Assert.Equal(node.children.[1].ToString(), "return 10;")
+        Assert.Equal(node.children.[2].ToString(), "}")
+        Assert.Equal(node.children.[3].ToString(), "")
+        Assert.Equal(node.children.[4].ToString(), "function noop() {}")
+        Assert.True(node.children.Count = 5)
+        
+    [<Fact>]
+    let ``test .toString()`` () =
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "function foo() {"
+            SourceChunk.ChunkArrSN [|SourceNode(_chunks=[|SourceChunk.ChunkS "return 10;"|])|]
+            SourceChunk.ChunkS "}"
+        |])
+        Assert.Equal(node.ToString(),"function foo() {return 10;}")
+    
+    [<Fact>]
+    let ``test .join()`` () =
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "a"
+            SourceChunk.ChunkS "b"
+            SourceChunk.ChunkS "c"
+            SourceChunk.ChunkS "d"
+        |])
+        Assert.Equal("a, b, c, d", node.Join(", ").ToString())
+        

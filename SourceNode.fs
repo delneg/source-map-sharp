@@ -19,29 +19,43 @@ type SourceChunk =
     | ChunkS of string
     | ChunkArrS of string[]
     | ChunkArrSN of SourceNode[]
-and SourceNodeChild = S of string | SN of SourceNode
+and SourceNodeChild =
+    | S of string
+    | SN of SourceNode
+    override this.ToString() =
+        match this with
+        | S s -> s
+        | SN sn -> sn.ToString()
 
 // SourceNodes provide a way to abstract over interpolating/concatenating
 // snippets of generated JavaScript source code while maintaining the line and
 // column information associated with the original source code.
 and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChunk[], ?_name: string) as this =
-    do if _chunks.IsSome then
-            _chunks.Value |> Array.iter (fun x -> this.Add x |> ignore)
-        else ()
-
+    let addChunkToArray (chunk:SourceChunk,arr: ResizeArray<SourceNodeChild>) =
+        match chunk with
+        | ChunkS str -> arr.Add(S str)
+        | ChunkArrS arrs -> arrs |> Array.iter (fun x -> arr.Add(S x))
+        | ChunkArrSN arrsn -> arrsn |> Array.iter (fun x -> arr.Add(SN x))
+    let mutable _children =
+        let arr = ResizeArray<SourceNodeChild>()
+        match _chunks with
+        |Some chunks ->
+            chunks |> Array.iter (fun chunk -> addChunkToArray(chunk,arr))
+            arr
+        |None -> arr
+    
     member val line = _line
     member val column = _column
     member val source = _source
     member val name = _name
-    member val children = ResizeArray<SourceNodeChild>() with get,set
+    member this.children
+        with get() = _children
+        and set(value) = _children <- value
     member val sourcesContents = Dictionary<string,string>()
 
     //  Add a chunk of generated JS to this source node.
     member _.Add(chunk: SourceChunk) : SourceNode =
-        match chunk with
-        | ChunkS str -> this.children.Add(S str)
-        | ChunkArrS arrs -> arrs |> Array.iter (fun x -> this.children.Add(S x))
-        | ChunkArrSN arrsn -> arrsn |> Array.iter (fun x -> this.children.Add(SN x))
+        addChunkToArray(chunk,this.children)
         this
     // Add a chunk of generated JS to the beginning of this source node.
     member _.Prepend(chunk: SourceChunk) =
@@ -49,6 +63,10 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
         | ChunkS str -> this.children.Insert(0,S str)
         | ChunkArrS arrs -> this.children.InsertRange(0, arrs |> Array.map S)
         | ChunkArrSN arrsn -> this.children.InsertRange(0, arrsn |> Array.map SN)
+        this
+    member _.Prepend(chunks: SourceChunk[]) =
+        for i = chunks.Length - 1 downto 0 do
+            this.Prepend(chunks.[i]) |> ignore
         this
     // Walk over the tree of JS snippets in this node and its children. The
     // walking function is called once for each snippet of JS and is passed that
@@ -64,10 +82,11 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
     member _.Join(sep: string) =
         if this.children.Count > 0 then
             let mutable newChildren = ResizeArray<SourceNodeChild>()
-            for i in [0..this.children.Count - 1] do
+            let len = this.children.Count
+            for i = 0 to len - 2 do
                 newChildren.Add(this.children.[i])
                 newChildren.Add(S sep)
-            newChildren.Add(this.children.[this.children.Count])
+            newChildren.Add(this.children.[len - 1])
             this.children <- newChildren
         this
     //  Return the string representation of this source node. Walks over the tree
