@@ -1081,3 +1081,25 @@ module SourceNodeTests =
         node.ReplaceRight("kill all humans", "watch Futurama") |> ignore
         Assert.Equal("hey sexy mama, want to watch Futurama?", node.ToString())
         
+    [<Fact>]
+    let ``test walkSourceContents`` () =
+        let aNode = SourceNode(_line=1,_column=0,_source="a.js",_chunks=[|SourceChunk.ChunkS "a"|])
+        aNode.SetSourceContent("a.js","someContent")
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "(function () {\n"
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [| aNode |]
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [|
+                SourceNode(_line=1,_column=1,_source="b.js",_chunks=[|SourceChunk.ChunkS "b"|])
+            |]
+            SourceChunk.ChunkS "}());"
+        |])
+        node.SetSourceContent("b.js","otherContent")
+        let results = ResizeArray<_>()
+        node.WalkSourceContents(results.Add)
+        Assert.Equal(results.Count, 2)
+        Assert.Equal(fst results.[0], "a.js")
+        Assert.Equal(snd results.[0], "someContent")
+        Assert.Equal(fst results.[1], "b.js")
+        Assert.Equal(snd results.[1], "otherContent")
