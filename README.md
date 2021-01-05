@@ -8,6 +8,8 @@ Which is originally written in JS. The initial purpose is to use it with https:/
 
 
 See https://github.com/fable-compiler/Fable/issues/2166 - "Bring back source map support"
+
+P.S. If you're a user that needs netstandard2.0 (as opposed to current netstandard2.1), please file an issue.
 ### Files - status
 
 1. `ArraySet` - Done & tested
