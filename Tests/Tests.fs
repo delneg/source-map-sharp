@@ -1014,4 +1014,70 @@ module SourceNodeTests =
             SourceChunk.ChunkS "d"
         |])
         Assert.Equal("a, b, c, d", node.Join(", ").ToString())
+    
+    [<Fact>]
+    let ``test .walk()`` () =
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "(function () {\n"
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [|
+                SourceNode(_line=1,_column=0,_source="a.js",
+                           _chunks=[|SourceChunk.ChunkS "someCall()"|])
+            |]
+            SourceChunk.ChunkS ";\n"
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [|
+                SourceNode(_line=2,_column=0,_source="b.js",
+                           _chunks=[|SourceChunk.ChunkS "if (foo) bar()"|])
+            |]
+            SourceChunk.ChunkS ";\n"
+            SourceChunk.ChunkS "}());"
+        |])
+        
+        let expected = [|
+            {| str= "(function () {\n"; source= None; line= None; column= None |}
+            {| str= "  "; source= None; line= None; column= None |}
+            {| str= "someCall()"; source= Some "a.js"; line= Some 1; column= Some 0 |}
+            {| str= ";\n"; source= None; line= None; column= None |}
+            {| str= "  "; source= None; line= None; column= None |}
+            {| str= "if (foo) bar()"; source= Some "b.js"; line= Some 2; column= Some 0 |}
+            {| str= ";\n"; source= None; line= None; column= None |}
+            {| str= "}());"; source= None; line= None; column= None |}
+          |]
+
+
+        let mutable i = 0
+        node.Walk(fun chunk loc ->
+            printfn "Starting loop %i" i
+            printfn "String: '%s', chunk: '%s'" expected.[i].str chunk
+            Assert.Equal(expected.[i].str,chunk)
+            printfn "Expected: %A, loc: %A" expected.[i] loc
+            Assert.Equal(expected.[i].source, loc.Source)
+            Assert.Equal(expected.[i].line, loc.line)
+            Assert.Equal(expected.[i].column, loc.column)
+            i <- i+1
+        )
+    
+    [<Fact>]
+    let ``test .replaceRight()`` () =
+        // Not nested
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "hello world"
+        |])
+        node.ReplaceRight("world","universe") |> ignore
+        Assert.Equal("hello universe", node.ToString())
+        
+        // Nested
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkArrSN [|
+                SourceNode(_chunks=[|
+                    SourceChunk.ChunkS "hey sexy mama, "
+                |])
+                SourceNode(_chunks=[|
+                    SourceChunk.ChunkS "want to kill all humans?"
+                |])
+            |]
+        |])
+        node.ReplaceRight("kill all humans", "watch Futurama") |> ignore
+        Assert.Equal("hey sexy mama, want to watch Futurama?", node.ToString())
         
