@@ -1103,6 +1103,13 @@ module SourceNodeTests =
         Assert.Equal(snd results.[0], "someContent")
         Assert.Equal(fst results.[1], "b.js")
         Assert.Equal(snd results.[1], "otherContent")
+    
+    [<Fact>]
+    let ``test .toStringWithSourceMap() with empty string`` () =
+        let node = SourceNode(_line=1,_column=0,_source="empty.js",_chunks=[|SourceChunk.ChunkS ""|])
+        let (code, _) = node.ToStringWithSourceMap(file="")
+        Assert.Equal(code,"")
+        
         
     [<Fact>]
     let ``test setSourceContent with toStringWithSourceMap`` () =
