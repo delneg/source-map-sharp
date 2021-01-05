@@ -100,7 +100,6 @@ type Base64Vlq() =
             if vlq > 0 then
                 // There are still more digits in this value, so we must make sure the
                 // continuation bit is marked.
-                //TODO: digit |= VLQ_CONTINUATION_BIT;
                 digit <- digit ||| Base64Vlq.VLQ_CONTINUATION_BIT
             encoded.Append(Base64.base64Encode(digit)) |> ignore
         encoded.ToString ()
