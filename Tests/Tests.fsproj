@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <Compile Include="Base64.fs" />
+        <Compile Include="Util.fs" />
         <Compile Include="SourceNode.fs" />
         <Compile Include="SourceMapGenerator.fs" />
         <Compile Include="ArraySet.fs" />

@@ -87,7 +87,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
             else
                 let mutable s = source
                 if aSourceRoot.IsSome then
-                    s <- System.IO.Path.GetRelativePath(this._sourceRoot.Value,source)
+                    s <- getRelativePath(this._sourceRoot.Value,source)
                 //don't need `util.toSetString(source)` in F#
                 if this._sourcesContents.ContainsKey(s) then
                     Some <| this._sourcesContents.[s]
@@ -98,7 +98,7 @@ type SourceMapGenerator(?skipValidation:bool,?file:string,?sourceRoot:string) as
     member _.SetSourceContent(aSourceFile, aSourceContent: string option) =
         let mutable source = aSourceFile
         if this._sourceRoot.IsSome then
-            source <- System.IO.Path.GetRelativePath(this._sourceRoot.Value,source)
+            source <- getRelativePath(this._sourceRoot.Value,source)
         if aSourceContent.IsSome then
             // Add the source content to the _sourcesContents map.
             // We don't need to create a new _sourceContents
