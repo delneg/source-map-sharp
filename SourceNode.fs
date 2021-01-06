@@ -81,7 +81,7 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
     // each of `this.children`.
     member _.Join(sep: string) =
         if this.children.Count > 0 then
-            let mutable newChildren = ResizeArray<SourceNodeChild>()
+            let newChildren = ResizeArray<SourceNodeChild>()
             let len = this.children.Count
             for i = 0 to len - 2 do
                 newChildren.Add(this.children.[i])
