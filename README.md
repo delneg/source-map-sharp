@@ -16,16 +16,16 @@ P.S. If you're a user that needs netstandard2.0 (as opposed to current netstanda
 2. `Base64` - Done & tested
 3. `Base64-vlq` - Done & tested
 4. `binary-search` - Not done, probably won't need
-5. `mapping-list` - Done, not tested specifically, maybe can be tested via SourceMapGenerator
+5. `mapping-list` - Done, not tested specifically, coverage shows 95% via other tessts
 6. `mapping.wasm` - Not done, probably won't need
 7. `read-wasm-browser` - Not done, probably won't need
 8. `read-wasm` - Not done, probably won't need
 9. `source-map-consumer` - Not done, Don't know if will need it or not at the moment
 10. `source-map-generator` - Done except the `consumer` parts, tested except `consumer` parts
-11. `source-node` - Done except the `consumer` parts, not tested
+11. `source-node` - Done except the `consumer` parts, tested partially
 12. `url-browser` - Not done, probably won't need
-13. `url` - Not done, need help
-14. `util` - Done partially, only what's needed, `url`-related stuff not done
+13. `url` - Not done, probably won't need
+14. `util` - Done partially, what's needed
 15. `wasm` - Not done, probably won't need
 
 #### "SourceMapConsumer"-related stuff
@@ -39,8 +39,5 @@ Not done at the moment:
 
 ### Help needed
 
-1. `util.join`
-2. `util.relative`
-3. Tests for `SourceMapNode`, `SourceMapGenerator`
-4. Decisions on `wasm` stuff
-5. Documentation & usage examples
+1. Tests for `SourceMapNode`
+2. Documentation & usage examples
