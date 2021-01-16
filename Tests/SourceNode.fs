@@ -124,6 +124,42 @@ module SourceNodeTests =
         node.ReplaceRight("kill all humans", "watch Futurama") |> ignore
         Assert.Equal("hey sexy mama, want to watch Futurama?", node.ToString())
         
+        
+    [<Fact>]
+    let ``test .toStringWithSourceMap()`` () =
+        ["\n";"\r\n"] |> List.iter (fun nl ->
+            let c1 = SourceChunk.ChunkS ("(function () {" + nl)
+            let c2 = SourceChunk.ChunkS ("  ")
+            let c3 = SourceNode(_line=1,_column=0,_source="a.js", _name="originalCall",
+                                _chunks=[|SourceChunk.ChunkS "someCall"|])
+            let c4 = SourceNode(_line=1,_column=8,_source="a.js",
+                                _chunks=[|SourceChunk.ChunkS "()"|])
+            let c5 = SourceChunk.ChunkS (";" + nl)
+            let c6 = SourceChunk.ChunkS ("  ")
+            let c7 = SourceNode(_line=2,_column=0,_source="b.js",
+                                _chunks=[|SourceChunk.ChunkS "if (foo) bar()"|])
+            let c8 = SourceChunk.ChunkS (";" + nl)
+            let c9 = SourceChunk.ChunkS ("}());")
+            let node = SourceNode(_chunks=[|
+                c1
+                c2
+                SourceChunk.ChunkArrSN ([|c3;c4|])
+                c5
+                c6
+                SourceChunk.ChunkArrSN ([|c7|])
+                c8
+                c9
+            |])
+            let (code, resultMap) = node.ToStringWithSourceMap(file="foo.js")
+            let expected = String.concat nl [
+              "(function () {"
+              "  someCall();"
+              "  if (foo) bar();"
+              "}());"
+              ]
+            Assert.Equal(expected, code)
+            //todo: sourcemapconsumer part
+        )
     [<Fact>]
     let ``test .toStringWithSourceMap() with consecutive newlines`` () =
         ["\n";"\r\n"] |> List.iter (fun nl ->
