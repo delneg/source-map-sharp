@@ -185,6 +185,80 @@ module SourceNodeTests =
             Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
         )
     
+    [<Fact>]
+    let ``test .toStringWithSourceMap() merging duplicate mappings`` () =
+        ["\n";"\r\n"] |> List.iter (fun nl ->
+            let c1 = SourceNode(_line=1,_column=0,_source="a.js", _chunks=[|SourceChunk.ChunkS ("(function")|])
+            let c2 = SourceNode(_line=1,_column=0,_source="a.js",_chunks=[|SourceChunk.ChunkS ("() {" + nl)|])
+            let c3 = SourceChunk.ChunkS ("  ")
+            let c4 = SourceNode(_line=1,_column=0,_source="a.js",_chunks=[|SourceChunk.ChunkS ("var Test = ")|])
+            let c5 = SourceNode(_line=1,_column=0,_source="b.js",_chunks=[|SourceChunk.ChunkS ("{};" + nl)|])
+            let c6 = SourceNode(_line=2,_column=0,_source="b.js",_chunks=[|SourceChunk.ChunkS ("Test")|])
+            let c7 = SourceNode(_line=2,_column=0,_source="b.js",_name="A",_chunks=[|SourceChunk.ChunkS (".A")|])
+            let c8 = SourceNode(_line=2,_column=20,_source="b.js",_name="A",_chunks=[|SourceChunk.ChunkS (" = { value: ")|])
+            let c9 = SourceChunk.ChunkS ("1234")
+            let c10 = SourceNode(_line=2,_column=40,_source="b.js",_name="A",_chunks=[|SourceChunk.ChunkS (" };" + nl)|])
+            let c11 = SourceChunk.ChunkS ("}());" + nl)
+            let c12 = SourceChunk.ChunkS ("/* Generated Source */")
+            let input = SourceNode(_chunks=[|
+                SourceChunk.ChunkArrSN ([|c1;c2|])
+                c3
+                SourceChunk.ChunkArrSN ([|c4;c5;c6;c7;c8|])
+                c9
+                SourceChunk.ChunkArrSN ([|c10|])
+                c11
+                c12
+            |])
+            let (code, inputMap) = input.ToStringWithSourceMap(file="foo.js")
+            let expected = String.concat nl [
+              "(function() {"
+              "  var Test = {};"
+              "Test.A = { value: 1234 };"
+              "}());"
+              "/* Generated Source */" ]
+            Assert.Equal(expected, code)
+            
+            let map = SourceMapGenerator(file="foo.js")
+            let generated: MappingIndex = { line= 1; column= 0 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            
+            // Here is no need for a empty mapping,
+            // because mappings ends at eol
+            let generated: MappingIndex = { line= 2; column= 2 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            
+            let generated: MappingIndex = { line= 2; column= 13 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "b.js")
+            
+            
+            let generated: MappingIndex = { line= 3; column= 0 }
+            let original: MappingIndex = { line= 2; column= 0 }
+            map.AddMapping(generated, original, "b.js")
+            
+            let generated: MappingIndex = { line= 3; column= 4 }
+            let original: MappingIndex = { line= 2; column= 0 }
+            map.AddMapping(generated, original, "b.js", name="A")
+            
+            let generated: MappingIndex = { line= 3; column= 6 }
+            let original: MappingIndex = { line= 2; column= 20 }
+            map.AddMapping(generated, original, "b.js", name="A")
+            
+            // This empty mapping is required,
+            // because there is a hole in the middle of the line
+            let generated: MappingIndex = { line= 3; column= 18 }
+            map.AddMapping(generated)
+            
+            let generated: MappingIndex = { line= 3; column= 22 }
+            let original: MappingIndex = { line= 2; column= 40 }
+            map.AddMapping(generated, original, "b.js", name="A")
+            // Here is no need for a empty mapping,
+            // because mappings ends at eol
+            Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
+       )
+    
     
     [<Fact>]
     let ``test .toStringWithSourceMap() multi-line SourceNodes`` () =
