@@ -2,6 +2,8 @@ module Tests.SourceNode
 
 open SourceMapSharp
 open Xunit
+open SourceMapSharp.Util
+open System.Text.Json
 
 module SourceNodeTests =
     [<Fact>]
@@ -152,6 +154,76 @@ module SourceNodeTests =
         let (code, _) = node.ToStringWithSourceMap(file="")
         Assert.Equal(code,"")
         
+    
+    [<Fact>]
+    let ``test .toStringWithSourceMap() multi-line SourceNodes`` () =
+        ["\n";"\r\n"] |> List.iter (fun nl ->
+            let c1 = SourceNode(_line=1,_column=0,_source="a.js",
+                                _chunks=[|SourceChunk.ChunkS ("(function() {" + nl + "var nextLine = 1;" + nl + "anotherLine();" + nl)|])
+            let c2 = SourceNode(_line=2,_column=2,_source="b.js",_chunks=[|SourceChunk.ChunkS ("Test.call(this, 123);" + nl)|])
+            let c3 = SourceNode(_line=2,_column=2,_source="b.js",_chunks=[|SourceChunk.ChunkS ("this['stuff'] = 'v';" + nl)|])
+            let c4 = SourceNode(_line=2,_column=2,_source="b.js",_chunks=[|SourceChunk.ChunkS ("anotherLine();" + nl)|])
+            let c5 = SourceChunk.ChunkS ("/*" + nl + "Generated" + nl + "Source" + nl + "*/" + nl)
+            let c6 = SourceNode(_line=3,_column=4,_source="c.js",_chunks=[|SourceChunk.ChunkS ("anotherLine();" + nl)|])
+            let c7 = SourceChunk.ChunkS ("/*" + nl + "Generated" + nl + "Source" + nl + "*/")
+            
+            let input = SourceNode(_chunks=[|
+                SourceChunk.ChunkArrSN ([|c1;c2;c3;c4|])
+                c5
+                SourceChunk.ChunkArrSN ([|c6|])
+                c7
+            |])
+            let (code, inputMap) = input.ToStringWithSourceMap(file="foo.js")
+            let expected = String.concat nl [
+              "(function() {"
+              "var nextLine = 1;"
+              "anotherLine();"
+              "Test.call(this, 123);"
+              "this['stuff'] = 'v';"
+              "anotherLine();"
+              "/*"
+              "Generated"
+              "Source"
+              "*/"
+              "anotherLine();"
+              "/*"
+              "Generated"
+              "Source"
+              "*/" ]
+            Assert.Equal(expected, code)
+            
+            let map = SourceMapGenerator(file="foo.js")
+            let generated: MappingIndex = { line= 1; column= 0 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            
+            let generated: MappingIndex = { line= 2; column= 0 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            
+            let generated: MappingIndex = { line= 3; column= 0 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            
+            let generated: MappingIndex = { line= 4; column= 0 }
+            let original: MappingIndex = { line= 2; column= 2 }
+            map.AddMapping(generated, original, "b.js")
+            
+            let generated: MappingIndex = { line= 5; column= 0 }
+            let original: MappingIndex = { line= 2; column= 2 }
+            map.AddMapping(generated, original, "b.js")
+            
+            let generated: MappingIndex = { line= 6; column= 0 }
+            let original: MappingIndex = { line= 2; column= 2 }
+            map.AddMapping(generated, original, "b.js")
+            
+            let generated: MappingIndex = { line= 11; column= 0 }
+            let original: MappingIndex = { line= 3; column= 4 }
+            map.AddMapping(generated, original, "c.js")
+            
+            Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
+       )
+        
         
     [<Fact>]
     let ``test setSourceContent with toStringWithSourceMap`` () =
@@ -178,4 +250,4 @@ module SourceNodeTests =
         let sc = map._sourcesContents |> Seq.map (fun kvp -> kvp.Value) |> Array.ofSeq
         Assert.Equal(sc.[0], "someContent");
         Assert.Equal(sc.[1], "otherContent");
-        
+    
