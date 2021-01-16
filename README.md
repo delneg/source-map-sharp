@@ -1,5 +1,6 @@
 # Source Map Sharp
 
+![Tests status](https://github.com/delneg/source-map-sharp/workflows/source-map-sharp-action/badge.svg?branch=master)
 ## About
 
 This is a direct rewrite (meaning, the goal was not to write 'idiomatic' F# code, but to resemble inital JS code as close as possible) of source map generation tool https://github.com/mozilla/source-map
