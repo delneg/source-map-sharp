@@ -16,9 +16,13 @@ P.S. If you're a user that needs netstandard2.0 (as opposed to current netstanda
 Legend:
 
 😊 - Everything fine
+
 🤨 - Everything fine except minor details (or not important right now details)
+
 😴 - Not needed / won't do
+
 😨 - Should be done, but isn't
+
 🤯 - Done but no tested
 
 1. 😊 `ArraySet` - Done & tested
