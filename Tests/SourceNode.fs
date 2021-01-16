@@ -154,6 +154,37 @@ module SourceNodeTests =
         let (code, _) = node.ToStringWithSourceMap(file="")
         Assert.Equal(code,"")
         
+    [<Fact>]
+    let ``test .toStringWithSourceMap() with consecutive newlines`` () =
+        ["\n";"\r\n"] |> List.iter (fun nl ->
+            let c1 = SourceChunk.ChunkS ("/***/" + nl + nl)
+            let c2 = SourceNode(_line=1,_column=0,_source="a.js",
+                                _chunks=[|SourceChunk.ChunkS ("'use strict';" + nl)|])
+            let c3 = SourceNode(_line=2,_column=0,_source="a.js",
+                                _chunks=[|SourceChunk.ChunkS "a();"|])
+            let input = SourceNode(_chunks=[|
+                c1
+                SourceChunk.ChunkArrSN ([|c2;c3|])
+            |])
+            let (code, inputMap) = input.ToStringWithSourceMap(file="foo.js")
+            let expected = String.concat nl [
+              "/***/"
+              ""
+              "'use strict';"
+              "a();"
+              ]
+            Assert.Equal(expected, code)
+            
+            let map = SourceMapGenerator(file="foo.js")
+            let generated: MappingIndex = { line= 3; column= 0 }
+            let original: MappingIndex = { line= 1; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            let generated: MappingIndex = { line= 4; column= 0 }
+            let original: MappingIndex = { line= 2; column= 0 }
+            map.AddMapping(generated, original, "a.js")
+            Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
+        )
+    
     
     [<Fact>]
     let ``test .toStringWithSourceMap() multi-line SourceNodes`` () =
