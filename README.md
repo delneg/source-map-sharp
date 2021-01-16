@@ -7,7 +7,9 @@ This is a direct rewrite (meaning, the goal was not to write 'idiomatic' F# code
 Which is originally written in JS. The initial purpose is to use it with https://github.com/fable-compiler/Fable project
 
 See https://github.com/fable-compiler/Fable/issues/2166 - "Bring back source map support"
+
 UPD: The issue above was closed, and this project is now being used by Fable to generated Source Maps. Hooray!
+
 
 P.S. If you're a user that needs netstandard2.0 (as opposed to current netstandard2.1), please file an issue.
 
