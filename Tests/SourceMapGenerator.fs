@@ -3,8 +3,8 @@ module Tests.SourceMapGenerator
 open System
 open SourceMapSharp
 open Xunit
-open System.Text.Json
 open SourceMapSharp.Util
+open Tests.Util
 
 module SourceMapGeneratorTests =
     let testMap: SourceGeneratorJSON = {
@@ -121,7 +121,8 @@ module SourceMapGeneratorTests =
         let original: MappingIndex = { line= 2; column= 10 }
         map.AddMapping(generated, original, "two.js", "n")
         
-        Assert.Equal (map.ToString(),JsonSerializer.Serialize(testMap))
+        TestUtils.assertEqualSourceMaps(map,testMap)
+        
         
     [<Fact>]
     let ``test that adding a mapping with an empty string name does not break generation`` () =
@@ -173,7 +174,7 @@ module SourceMapGeneratorTests =
              sourcesContent=None
              sourceRoot=None
             }
-        Assert.Equal (map.ToString(),JsonSerializer.Serialize(expected))
+        TestUtils.assertEqualSourceMaps(map,expected)
     [<Fact>]
     let ``test ignore duplicate mappings.`` () =
         let map1 = SourceMapGenerator(file="min.js",sourceRoot="/the/root")
@@ -187,14 +188,14 @@ module SourceMapGeneratorTests =
         
         map2.AddMapping(nullMapping1)
         
-        Assert.Equal (map1.ToString(),map2.ToString())
-        
+        TestUtils.assertEqualSourceMaps(map1,map2)
+                
         map1.AddMapping(nullMapping2)
         map1.AddMapping(nullMapping1)
 
         map2.AddMapping(nullMapping2)
         
-        Assert.Equal (map1.ToString(),map2.ToString())
+        TestUtils.assertEqualSourceMaps(map1,map2)
         
         let srcMapping1Generated: MappingIndex = { line= 1; column= 0 }
         let srcMapping1Original: MappingIndex = { line= 11; column= 0 }
@@ -212,14 +213,14 @@ module SourceMapGeneratorTests =
         
         map2.AddMapping(srcMapping1Generated,srcMapping1Original,srcMapping1Source)
         
-        Assert.Equal (map1.ToString(),map2.ToString())
+        TestUtils.assertEqualSourceMaps(map1,map2)
         
         map1.AddMapping(srcMapping2Generated,srcMapping2Original,srcMapping2Source)
         map1.AddMapping(srcMapping1Generated,srcMapping1Original,srcMapping1Source)
         
         map2.AddMapping(srcMapping2Generated,srcMapping2Original,srcMapping2Source)
         
-        Assert.Equal (map1.ToString(),map2.ToString())
+        TestUtils.assertEqualSourceMaps(map1,map2)
         
         
         let fullMapping1Generated: MappingIndex = { line= 1; column= 0 }
@@ -240,13 +241,13 @@ module SourceMapGeneratorTests =
         
         map2.AddMapping(fullMapping1Generated,fullMapping1Original,fullMapping1Source,fullMapping1Name)
         
-        Assert.Equal (map1.ToString(),map2.ToString())
+        TestUtils.assertEqualSourceMaps(map1,map2)
         
         map1.AddMapping(fullMapping2Generated,fullMapping2Original,fullMapping2Source,fullMapping2Name)
         map1.AddMapping(fullMapping1Generated,fullMapping1Original,fullMapping1Source,fullMapping1Name)
         
         map2.AddMapping(fullMapping2Generated,fullMapping2Original,fullMapping2Source,fullMapping2Name)
-        Assert.Equal (map1.ToString(),map2.ToString())
+        TestUtils.assertEqualSourceMaps(map1,map2)
         
         
     [<Fact>]
@@ -269,7 +270,7 @@ module SourceMapGeneratorTests =
              sourcesContent=None
              sourceRoot=None
             }
-        Assert.Equal (map.ToString(),JsonSerializer.Serialize(expected))
+        TestUtils.assertEqualSourceMaps(map,expected)
         
     [<Fact>]
     let ``test setting sourcesContent to null when already null`` () =

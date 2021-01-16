@@ -1,9 +1,17 @@
 module Tests.Util
 
-open System
 open SourceMapSharp
+open SourceMapSharp.Util
 open Xunit
+open System.Text.Json
 
+type TestUtils =
+  static member assertEqualSourceMaps(s1:SourceMapGenerator,s2:SourceMapGenerator) =
+    Assert.Equal (s1.ToString(),s2.ToString())
+  
+  static member assertEqualSourceMaps(s1:SourceMapGenerator,s2:SourceGeneratorJSON) =
+    Assert.Equal (s1.ToString(),JsonSerializer.Serialize(s2))
+    
 module UtilTests =
     [<Fact>]
     let ``test relative()`` () =

@@ -3,8 +3,7 @@ module Tests.SourceNode
 open SourceMapSharp
 open Xunit
 open SourceMapSharp.Util
-open System.Text.Json
-
+open Tests.Util
 module SourceNodeTests =
     [<Fact>]
     let ``test .add()`` () =
@@ -126,35 +125,6 @@ module SourceNodeTests =
         Assert.Equal("hey sexy mama, want to watch Futurama?", node.ToString())
         
     [<Fact>]
-    let ``test walkSourceContents`` () =
-        let aNode = SourceNode(_line=1,_column=0,_source="a.js",_chunks=[|SourceChunk.ChunkS "a"|])
-        aNode.SetSourceContent("a.js","someContent")
-        let node = SourceNode(_chunks=[|
-            SourceChunk.ChunkS "(function () {\n"
-            SourceChunk.ChunkS "  "
-            SourceChunk.ChunkArrSN [| aNode |]
-            SourceChunk.ChunkS "  "
-            SourceChunk.ChunkArrSN [|
-                SourceNode(_line=1,_column=1,_source="b.js",_chunks=[|SourceChunk.ChunkS "b"|])
-            |]
-            SourceChunk.ChunkS "}());"
-        |])
-        node.SetSourceContent("b.js","otherContent")
-        let results = ResizeArray<_>()
-        node.WalkSourceContents(results.Add)
-        Assert.Equal(results.Count, 2)
-        Assert.Equal(fst results.[0], "a.js")
-        Assert.Equal(snd results.[0], "someContent")
-        Assert.Equal(fst results.[1], "b.js")
-        Assert.Equal(snd results.[1], "otherContent")
-    
-    [<Fact>]
-    let ``test .toStringWithSourceMap() with empty string`` () =
-        let node = SourceNode(_line=1,_column=0,_source="empty.js",_chunks=[|SourceChunk.ChunkS ""|])
-        let (code, _) = node.ToStringWithSourceMap(file="")
-        Assert.Equal(code,"")
-        
-    [<Fact>]
     let ``test .toStringWithSourceMap() with consecutive newlines`` () =
         ["\n";"\r\n"] |> List.iter (fun nl ->
             let c1 = SourceChunk.ChunkS ("/***/" + nl + nl)
@@ -182,7 +152,7 @@ module SourceNodeTests =
             let generated: MappingIndex = { line= 4; column= 0 }
             let original: MappingIndex = { line= 2; column= 0 }
             map.AddMapping(generated, original, "a.js")
-            Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
+            TestUtils.assertEqualSourceMaps(map,inputMap)
         )
     
     [<Fact>]
@@ -256,7 +226,7 @@ module SourceNodeTests =
             map.AddMapping(generated, original, "b.js", name="A")
             // Here is no need for a empty mapping,
             // because mappings ends at eol
-            Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
+            TestUtils.assertEqualSourceMaps(map,inputMap)
        )
     
     
@@ -326,9 +296,15 @@ module SourceNodeTests =
             let original: MappingIndex = { line= 3; column= 4 }
             map.AddMapping(generated, original, "c.js")
             
-            Assert.Equal (map.ToString(),JsonSerializer.Serialize(inputMap.toJSON()))
+            TestUtils.assertEqualSourceMaps(map,inputMap)
+            
        )
         
+    [<Fact>]
+    let ``test .toStringWithSourceMap() with empty string`` () =
+        let node = SourceNode(_line=1,_column=0,_source="empty.js",_chunks=[|SourceChunk.ChunkS ""|])
+        let (code, _) = node.ToStringWithSourceMap(file="")
+        Assert.Equal(code,"")
         
     [<Fact>]
     let ``test setSourceContent with toStringWithSourceMap`` () =
@@ -349,10 +325,33 @@ module SourceNodeTests =
         Assert.NotNull(map) //dummy assert
         
         Assert.Equal(map._sources.Size(), 2)
-        Assert.Equal(map._sources.At(0).Value, "a.js");
-        Assert.Equal(map._sources.At(1).Value, "b.js");
+        Assert.Equal(map._sources.At(0).Value, "a.js")
+        Assert.Equal(map._sources.At(1).Value, "b.js")
         Assert.Equal(map._sourcesContents.Count, 2)
         let sc = map._sourcesContents |> Seq.map (fun kvp -> kvp.Value) |> Array.ofSeq
-        Assert.Equal(sc.[0], "someContent");
-        Assert.Equal(sc.[1], "otherContent");
+        Assert.Equal(sc.[0], "someContent")
+        Assert.Equal(sc.[1], "otherContent")
+   
+    [<Fact>]
+    let ``test walkSourceContents`` () =
+        let aNode = SourceNode(_line=1,_column=0,_source="a.js",_chunks=[|SourceChunk.ChunkS "a"|])
+        aNode.SetSourceContent("a.js","someContent")
+        let node = SourceNode(_chunks=[|
+            SourceChunk.ChunkS "(function () {\n"
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [| aNode |]
+            SourceChunk.ChunkS "  "
+            SourceChunk.ChunkArrSN [|
+                SourceNode(_line=1,_column=1,_source="b.js",_chunks=[|SourceChunk.ChunkS "b"|])
+            |]
+            SourceChunk.ChunkS "}());"
+        |])
+        node.SetSourceContent("b.js","otherContent")
+        let results = ResizeArray<_>()
+        node.WalkSourceContents(results.Add)
+        Assert.Equal(results.Count, 2)
+        Assert.Equal(fst results.[0], "a.js")
+        Assert.Equal(snd results.[0], "someContent")
+        Assert.Equal(fst results.[1], "b.js")
+        Assert.Equal(snd results.[1], "otherContent")
     
