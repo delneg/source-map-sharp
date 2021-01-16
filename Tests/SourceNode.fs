@@ -91,10 +91,7 @@ module SourceNodeTests =
 
         let mutable i = 0
         node.Walk(fun chunk loc ->
-            printfn "Starting loop %i" i
-            printfn "String: '%s', chunk: '%s'" expected.[i].str chunk
             Assert.Equal(expected.[i].str,chunk)
-            printfn "Expected: %A, loc: %A" expected.[i] loc
             Assert.Equal(expected.[i].source, loc.Source)
             Assert.Equal(expected.[i].line, loc.line)
             Assert.Equal(expected.[i].column, loc.column)
