@@ -58,3 +58,4 @@ Not done at the moment:
 
 1. Source map consumer
 2. Documentation & usage examples
+3. Decisions on WASM stuff - Rust repo https://github.com/fitzgen/source-map-mappings

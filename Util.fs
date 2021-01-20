@@ -19,6 +19,18 @@ module Util =
         sourcesContent: seq<string option> option
         sourceRoot: string option
     }
+    
+    type RawSection = {
+        offset: MappingIndex
+        map: SourceGeneratorJSON
+    }
+    type RawIndexMap = {
+        version: int
+        file: string option
+        sourceRoot: string option
+        skipValidation: bool option
+        sections: seq<RawSection>
+    }
     let strcmp (s1: string option) (s2:string option) =
         if s1.IsSome && s2.IsSome then
             if s1 = s2 then 0
@@ -129,7 +141,9 @@ module Util =
          // let isDir = IO.Directory.Exists 
          getRelativeFileOrDirPath (isDir fromFullPath) fromFullPath (isDir toFullPath) toFullPath
          
-         
+    let computeSourceUrl (sourceRoot:string) (sourceUrl:string) (sourceMapUrl:string) =
+        //TODO
+        sourceUrl
     type MappingComparer() =
       interface IComparer<Mapping> with
         member _.Compare(a,b) = compareByGeneratedPositionsInflated a b

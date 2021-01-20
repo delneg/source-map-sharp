@@ -15,6 +15,7 @@
         <Compile Include="Base64VLQ.fs" />
         <Compile Include="SourceMapGenerator.fs" />
         <Compile Include="SourceNode.fs" />
+        <Compile Include="SourceMapConsumer.fs"/>
     </ItemGroup>
 
     <ItemGroup>
