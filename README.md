@@ -52,7 +52,7 @@ Not done at the moment:
 2. SourceMapGenerator `fromSourceMap` function
 3. SourceMapConsumer module
 4. SourceMapNode, SourceMapGenerator - `consumer`-related tests
-
+5. Article by the author of WASM - https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/
 
 ### Help needed
 
