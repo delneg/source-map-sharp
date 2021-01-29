@@ -32,7 +32,7 @@ type BasicSourceMapConsumer(sourceMap: SourceGeneratorJSON, sourceMapUrl: string
     let _sources = ArraySet.fromArray(sourceMap.sources |> Array.ofSeq, true)
     let sourceRoot = sourceMap.sourceRoot |> Option.defaultValue ""
     let _absoluteSources = ArraySet.fromArray(sourceMap.sources
-                                              |> Seq.map (fun s -> computeSourceUrl _sourceRoot s sourceMapUrl)
+                                              |> Seq.map (fun s -> computeSourceUrl sourceRoot s sourceMapUrl)
                                               |> Array.ofSeq
                                               ,true)
     let sourcesContent = sourceMap.sourcesContent |> Option.defaultValue Seq.empty

@@ -7,7 +7,6 @@ module Util =
         Original: MappingIndex option
         Source: string option
         Name: string option
-        
     }
     
     type SourceGeneratorJSON = {
