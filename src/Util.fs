@@ -1,5 +1,6 @@
 namespace SourceMapSharp
 open System.Collections.Generic
+
 module Util =
     type MappingIndex = {line: int; column: int}
     type Mapping = {
@@ -7,9 +8,8 @@ module Util =
         Original: MappingIndex option
         Source: string option
         Name: string option
-        
     }
-    
+
     type SourceGeneratorJSON = {
         version: int
         sources: seq<string>
@@ -19,11 +19,12 @@ module Util =
         sourcesContent: seq<string option> option
         sourceRoot: string option
     }
-    
+
     type RawSection = {
         offset: MappingIndex
         map: SourceGeneratorJSON
     }
+
     type RawIndexMap = {
         version: int
         file: string option
@@ -31,6 +32,7 @@ module Util =
         skipValidation: bool option
         sections: seq<RawSection>
     }
+
     let strcmp (s1: string option) (s2:string option) =
         if s1.IsSome && s2.IsSome then
             if s1 = s2 then 0
@@ -41,8 +43,7 @@ module Util =
         elif s1.IsNone then 1
         elif s2.IsNone then -1
         else -1
-    
-    
+
     let compareByGeneratedPositionsInflated (mappingA: Mapping) (mappingB: Mapping) =
         let mutable cmp = mappingA.Generated.line - mappingB.Generated.line
         if cmp <> 0 then cmp
@@ -63,7 +64,6 @@ module Util =
                         else strcmp mappingA.Name mappingB.Name
                 | _ -> strcmp mappingA.Name mappingB.Name
 
-    
     let [<Literal>] private dummyFile = "__DUMMY-FILE__.txt"
     let private Combine (path1: string, path2: string) =
         let path1 =
@@ -80,10 +80,10 @@ module Util =
         let i = path.LastIndexOf(".")
         if i < 0 then ""
         else path.Substring(i)
-        
+
     let private normalizePath (path: string) =
         path.Replace('\\', '/')
-    
+
     /// Checks if path starts with "./", ".\" or ".."
     let private isRelativePath (path: string) =
         let len = path.Length
@@ -98,7 +98,7 @@ module Util =
                     | '/' | '\\' | '.' -> true
                     | _ -> false
         else false
-        
+
     /// Creates a relative path from one file or folder to another. 
     let private getRelativeFileOrDirPath fromIsDir fromFullPath toIsDir toFullPath = 
          // Algorithm adapted from http://stackoverflow.com/a/6244188 
@@ -140,11 +140,11 @@ module Util =
          let isDir = GetExtension >> System.String.IsNullOrWhiteSpace 
          // let isDir = IO.Directory.Exists 
          getRelativeFileOrDirPath (isDir fromFullPath) fromFullPath (isDir toFullPath) toFullPath
-         
+
     let computeSourceUrl (sourceRoot:string) (sourceUrl:string) (sourceMapUrl:string) =
         //TODO
         sourceUrl
+
     type MappingComparer() =
-      interface IComparer<Mapping> with
-        member _.Compare(a,b) = compareByGeneratedPositionsInflated a b
-        
+        interface IComparer<Mapping> with
+            member _.Compare(a,b) = compareByGeneratedPositionsInflated a b

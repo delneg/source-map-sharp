@@ -5,7 +5,7 @@ open System.Collections.Generic
 type ArraySet<'T when 'T : equality>() as this =
     member val _array = new ResizeArray<'T>()
     member val _set = Dictionary<'T,int>()
-    
+
     member _.Size() = this._set.Count
     member _.Has(aStr:'T) =
         this._set.ContainsKey(aStr)
@@ -28,5 +28,3 @@ type ArraySet<'T when 'T : equality>() as this =
         for i in aArray do
             s.Add(i,allowDuplicates)
         s
-    
-    
