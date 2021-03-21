@@ -2,11 +2,12 @@ namespace SourceMapSharp
 
 open System.Text.RegularExpressions
 open System.Collections.Generic
+
 module SourceNode =
     let REGEX_NEWLINE = Regex @"(\r?\n)"
     // Newline character code for charCodeAt() comparisons
     let NEWLINE_CODE = 10
-    
+
     //We don't need `isSourceNode` since we have DU's
 
 type SourceMappingOriginal = {
@@ -15,10 +16,12 @@ type SourceMappingOriginal = {
     Source: string option
     Name: string option
 }
+
 type SourceChunk =
     | ChunkS of string
     | ChunkArrS of string[]
     | ChunkArrSN of SourceNode[]
+
 and SourceNodeChild =
     | S of string
     | SN of SourceNode
@@ -39,11 +42,11 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
     let mutable _children =
         let arr = ResizeArray<SourceNodeChild>()
         match _chunks with
-        |Some chunks ->
+        | Some chunks ->
             chunks |> Array.iter (fun chunk -> addChunkToArray(chunk,arr))
             arr
-        |None -> arr
-    
+        | None -> arr
+
     member val line = _line
     member val column = _column
     member val source = _source
@@ -76,7 +79,7 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
             match chunk with
             | S str -> fn str {line = this.line;column=this.column;Source=this.source;Name=this.name}
             | SN sn -> sn.Walk(fn)
-    
+
     //  Like `String.prototype.join` except for SourceNodes. Inserts `aStr` between
     // each of `this.children`.
     member _.Join(sep: string) =
@@ -89,6 +92,7 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
             newChildren.Add(this.children.[len - 1])
             this.children <- newChildren
         this
+
     //  Return the string representation of this source node. Walks over the tree
     //  and concatenates all the various snippets together to one string.
     override _.ToString() =
@@ -108,12 +112,12 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
         | None ->
             this.children.Add("".Replace(pattern,replacement) |> S)
             this
-    
+
     // Set the source content for a source file. This will be added to the SourceMapGenerator
     //  in the sourcesContent field.
     member _.SetSourceContent(file,content) =
         this.sourcesContents.[file] <- content
-    
+
     // Walk over the tree of SourceNodes. The walking function is called for each
     //  source file content and is passed the filename and source content.
     member _.WalkSourceContents fn =
@@ -122,7 +126,7 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
             | SN sn -> sn.WalkSourceContents(fn)
             | _ -> ()
         this.sourcesContents |> Seq.iter (fun kvp -> fn(kvp.Key,kvp.Value))
-    
+
     // Returns the string representation of this source node along with a source
     // map.
     member _.ToStringWithSourceMap(?skipValidation:bool,?file:string,?sourceRoot:string) =
@@ -189,4 +193,3 @@ and SourceNode(?_line: int, ?_column: int, ?_source: string, ?_chunks: SourceChu
             )
         this.WalkSourceContents(fun (file,content) -> map.SetSourceContent(file,Some content))
         (generatedCode.ToString(), map)
-        

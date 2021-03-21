@@ -3,9 +3,6 @@ namespace SourceMapSharp
 open System.Collections.Generic
 open SourceMapSharp.Util
 
-open System.Text.Json
-open System.Text.Json.Serialization
-
 module SourceMapConsumer =
     let version = 3
     let GENERATED_ORDER = 1
@@ -20,7 +17,7 @@ type BasicSourceMapConsumer(sourceMap: SourceGeneratorJSON, sourceMapUrl: string
         then failwithf "Unsupported version %i" sourceMap.version
 
     let _version = sourceMap.version
-    
+
     let _mappings = sourceMap.mappings
     // Don't loosen up on 'names' like in JS, because no Sass problem
     let _sourceLookupCache = Dictionary<_,_>()
@@ -31,13 +28,13 @@ type BasicSourceMapConsumer(sourceMap: SourceGeneratorJSON, sourceMapUrl: string
     let _names =  ArraySet.fromArray(sourceMap.names |> Array.ofSeq, true)
     let _sources = ArraySet.fromArray(sourceMap.sources |> Array.ofSeq, true)
     let sourceRoot = sourceMap.sourceRoot |> Option.defaultValue ""
-    let _absoluteSources = ArraySet.fromArray(sourceMap.sources
-                                              |> Seq.map (fun s -> computeSourceUrl _sourceRoot s sourceMapUrl)
-                                              |> Array.ofSeq
-                                              ,true)
+    let sourceUrls =
+        sourceMap.sources
+        |> Seq.map (fun s -> computeSourceUrl sourceRoot s sourceMapUrl)
+        |> Array.ofSeq
+    let _absoluteSources = ArraySet.fromArray(sourceUrls, true)
     let sourcesContent = sourceMap.sourcesContent |> Option.defaultValue Seq.empty
     member val _computedColumnSpans = false
     member val _mappingsPtr = 0
-    
+
     member _.sources() = _absoluteSources.ToArray()
-    
