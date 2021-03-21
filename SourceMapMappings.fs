@@ -90,6 +90,9 @@ module SourceMapMappings =
     |Some x -> fn x
     |None -> def
     
+  let inline read_relative_vlq(previous,input) =
+    let decoded = Base64Vlq.VlqDecode(input)
+    let (n,overflowed) = 
   let invoke_mapping_callback (mapping:Mapping) =
       let generated_line = mapping.generated_line
       let generated_column = mapping.generated_column
@@ -134,17 +137,21 @@ module SourceMapMappings =
       // `A;A;A;...`.
       let mutable by_generated: Mapping array = Array.empty
       input |> String.iteri (fun i (b) ->
+        let chrs = input.ToCharArray()
         match b with
         | ',' -> ()
-        | v ->
+        | _ ->
           let mutable mapping = Mapping.Default
           mapping.generated_line <- generated_line
           // First is a generated column that is always present.
 //          read_relative_vlq(&mut generated_column, &mut input)?;
 //          mapping.generated_column = generated_column as u32;
+          let m =  Array.tryItem (i+1) chrs
+          if m |> map_or(true, is_mapping_separator)
+          then None
+          else
+            
           
-          let mr = v |> map_or(true, is_mapping_separator)
-          ()
         ()
       )
       if generated_line_start_index < uint32 by_generated.LongLength then

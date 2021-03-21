@@ -10,10 +10,10 @@
 
     <ItemGroup>
         <Compile Include="Util.fs" />
-        <Compile Include="SourceMapMappings.fs" />
         <Compile Include="ArraySet.fs" />
         <Compile Include="MappingList.fs" />
         <Compile Include="Base64VLQ.fs" />
+        <Compile Include="SourceMapMappings.fs" />
         <Compile Include="SourceMapGenerator.fs" />
         <Compile Include="SourceNode.fs" />
         <Compile Include="SourceMapConsumer.fs"/>
