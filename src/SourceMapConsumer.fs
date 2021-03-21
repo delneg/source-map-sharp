@@ -3,9 +3,6 @@ namespace SourceMapSharp
 open System.Collections.Generic
 open SourceMapSharp.Util
 
-open System.Text.Json
-open System.Text.Json.Serialization
-
 module SourceMapConsumer =
     let version = 3
     let GENERATED_ORDER = 1

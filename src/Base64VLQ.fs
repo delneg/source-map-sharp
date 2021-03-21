@@ -1,10 +1,10 @@
 namespace SourceMapSharp
 
 open System
-open System.Collections.Generic
+#if !FABLE_COMPILER
 open System.IO
 open System.Runtime.Serialization
-open System.Text
+#endif
 
 // Original C# Code
 // https://github.com/madskristensen/WebEssentials2013/blob/96d37799/EditorExtensions/Shared/Helpers/Base64VLQ.cs
@@ -19,10 +19,12 @@ type VlqException() =
         (VlqException ())
         then
             ()
+#if !FABLE_COMPILER
     new(info : SerializationInfo, context : StreamingContext) = 
         (VlqException ())
         then
             ()
+#endif
 
 module Base64 =
     let intToCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".ToCharArray()
@@ -55,14 +57,18 @@ type Base64Vlq() =
     static member VLQ_BASE_MASK = Base64Vlq.VLQ_BASE - 1
     // binary: 100000
     static member VLQ_CONTINUATION_BIT = Base64Vlq.VLQ_BASE
+
     static member private IsMappingSeparator(ch : int) = 
         ch = (int ',') || ch = (int ';')
+
+#if !FABLE_COMPILER
     static member private GetName(index : int, basePath : string, sources : string[]) = 
         if sources.Length = 0
         then Some (String.Empty)
         elif sources.Length > index
         then Some (Path.GetFullPath (Path.Combine (basePath, sources.[index])))
         else None
+#endif
 
     // Converts from a two-complement value to a value where the sign bit is
     // placed in the least significant bit.  For example, as decimals:
@@ -85,7 +91,7 @@ type Base64Vlq() =
         else shifted
 
     static member Encode(number : int) = 
-        let mutable encoded = new StringBuilder()
+        let mutable encoded = new System.Text.StringBuilder()
         let mutable (digit : int) = Unchecked.defaultof<int>
         let mutable vlq = Base64Vlq.ToVLQSigned (number)
         // isZeroCase is needed because F# doesn't have 'do {} while'
@@ -101,6 +107,7 @@ type Base64Vlq() =
             encoded.Append(Base64.base64Encode(digit)) |> ignore
         encoded.ToString ()
 
+#if !FABLE_COMPILER
     static member VlqDecode(stream : TextReader) = 
         let mutable result = 0
         let mutable shift = 0
@@ -115,3 +122,4 @@ type Base64Vlq() =
             result <- result + (digit <<< shift)
             shift <- shift + Base64Vlq.VLQ_BASE_SHIFT
         Base64Vlq.FromVLQSigned (result)
+#endif

@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "dotnet run -c Release -p ../Fable/src/Fable.Cli -- source-map-sharp.fsproj --outDir out",
+    "test": "dotnet test"
+  }
+}

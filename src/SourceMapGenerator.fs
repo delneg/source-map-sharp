@@ -3,12 +3,14 @@ namespace SourceMapSharp
 open System.Collections.Generic
 open SourceMapSharp.Util
 
+#if !FABLE_COMPILER
 open System.Text.Json
 open System.Text.Json.Serialization
 module SourceMapGenerator =
     let setup() =
         let options = JsonSerializerOptions()
         options.Converters.Add(JsonFSharpConverter())
+#endif
 
 
  // An instance of the SourceMapGenerator represents a source map which is
@@ -20,7 +22,9 @@ module SourceMapGenerator =
 
 type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) =
 
+#if !FABLE_COMPILER
     do SourceMapGenerator.setup()
+#endif
 
     let _file = file
     let _sourceRoot = sourceRoot
@@ -53,7 +57,7 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
 
         if isInvalid then
             let options = {|generated = generated; source=source; original=original; name=name|}
-            let err = sprintf "Invalid mapping: %s" (JsonSerializer.Serialize(options))
+            let err = sprintf "Invalid mapping: %A" options
             raise (System.Exception(err))
 
     // Add a single mapping from original source line and column to the generated
@@ -130,8 +134,10 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
           sourcesContent=sourcesContent
           sourceRoot=_sourceRoot }
 
+#if !FABLE_COMPILER
     // Render the source map being generated to a string.
     override this.ToString() = JsonSerializer.Serialize(this.toJSON())
+#endif
 
     // Serialize the accumulated mappings in to the stream of base 64 VLQs
     // specified by the source map format.
