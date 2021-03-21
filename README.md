@@ -11,9 +11,6 @@ See https://github.com/fable-compiler/Fable/issues/2166 - "Bring back source map
 
 UPD: The issue above was closed, and this project is now being used by Fable to generated Source Maps. Hooray!
 
-
-P.S. If you're a user that needs netstandard2.0 (as opposed to current netstandard2.1), please file an issue.
-
 ### Files - status
 
 Legend:
