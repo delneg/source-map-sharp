@@ -3,13 +3,12 @@ namespace SourceMapSharp
 open System.Collections.Generic
 open SourceMapSharp.Util
 
-open System.Text.Json
 
- // An instance of the SourceMapGenerator represents a source map which is
- // being built incrementally. You may pass an object with the following
- // properties:
- //  - file: The filename of the generated source.
- //  - sourceRoot: A root for all relative URLs in this source map.
+// An instance of the SourceMapGenerator represents a source map which is
+// being built incrementally. You may pass an object with the following
+// properties:
+//  - file: The filename of the generated source.
+//  - sourceRoot: A root for all relative URLs in this source map.
 
 
 type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) =
@@ -124,7 +123,7 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
 
 #if !FABLE_COMPILER
     // Render the source map being generated to a string.
-    override this.ToString() = JsonSerializer.Serialize(this.toJSON())
+    override this.ToString() = System.Text.Json.JsonSerializer.Serialize(this.toJSON())
 #endif
 
     // Serialize the accumulated mappings in to the stream of base 64 VLQs
