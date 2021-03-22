@@ -1,6 +1,5 @@
 namespace SourceMapSharp
 
-open System.Collections.Generic
 open SourceMapSharp.Util
 
 module MappingList =
