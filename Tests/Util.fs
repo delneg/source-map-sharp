@@ -10,7 +10,7 @@ type TestUtils =
     Assert.Equal (s1.ToString(),s2.ToString())
   
   static member assertEqualSourceMaps(s1:SourceMapGenerator,s2:SourceGeneratorJSON) =
-    Assert.Equal (s1.ToString(),JsonSerializer.Serialize(s2))
+    Assert.Equal (s1.ToString(),s2.Serialize())
     
 module UtilTests =
     [<Fact>]

@@ -10,15 +10,17 @@ module Util =
         Name: string option
     }
 
-    type SourceGeneratorJSON = {
-        version: int
-        sources: seq<string>
-        names: seq<string>
-        mappings: string
-        file: string option
-        sourcesContent: seq<string option> option
-        sourceRoot: string option
-    }
+    type SourceGeneratorJSON =
+        {   version: int
+            sources: seq<string>
+            names: seq<string>
+            mappings: string
+            file: string option
+            sourcesContent: seq<string option> option
+            sourceRoot: string option }
+        /// Render the source map being generated to a string.
+        member this.Serialize() =
+            System.Text.Json.JsonSerializer.Serialize(this, System.Text.Json.FSharpConverters.Options)
 
     type RawSection = {
         offset: MappingIndex

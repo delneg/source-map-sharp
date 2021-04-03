@@ -9,13 +9,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="FSharpConverters.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Include="src/Util.fs" />
         <Compile Include="src/ArraySet.fs" />
         <Compile Include="src/MappingList.fs" />
         <Compile Include="src/Base64VLQ.fs" />
         <Compile Include="src/SourceMapGenerator.fs" />
         <Compile Include="src/SourceNode.fs" />
-        <Compile Include="src/SourceMapConsumer.fs"/>
+        <Compile Include="src/SourceMapConsumer.fs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -123,7 +123,7 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
 
 #if !FABLE_COMPILER
     // Render the source map being generated to a string.
-    override this.ToString() = System.Text.Json.JsonSerializer.Serialize(this.toJSON())
+    override this.ToString() = this.toJSON().Serialize()
 #endif
 
     // Serialize the accumulated mappings in to the stream of base 64 VLQs
