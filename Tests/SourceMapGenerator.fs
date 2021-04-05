@@ -27,10 +27,15 @@ module SourceMapGeneratorTests =
         Assert.True map.sourceRoot.IsNone
     
     [<Fact>]
-    let ``test  JSON serialization`` () =
+    let ``test JSON serialization 1`` () =
         let map = SourceMapGenerator(file="foo.js",sourceRoot=".")
         let s = map.ToString()
         Assert.NotNull s
+
+    [<Fact>]
+    let ``test JSON serialization 2`` () =
+        let s = testMap.Serialize()
+        Assert.Equal("""{"version":3,"sources":["one.js","two.js"],"names":["bar","baz","n"],"mappings":"CAAC,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA","file":"min.js","sourcesContent":null,"sourceRoot":"/the/root"}""", s)
         
     [<Fact>]
     let ``test adding mappings (case 1)`` () =
