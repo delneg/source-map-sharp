@@ -2,6 +2,8 @@
 
 namespace System.Text.Json
 
+#if !FABLE_COMPILER
+
 open System
 open System.Collections.Generic
 open System.Text.Json.Serialization
@@ -91,3 +93,5 @@ module FSharpConverters =
         opt.Converters.Add(new MapConverter()) |> ignore
         opt.Converters.Add(new ListConverter()) |> ignore
         opt
+
+#endif //!FABLE_COMPILER

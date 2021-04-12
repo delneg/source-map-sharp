@@ -9,10 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="FSharpConverters.fs" />
-    </ItemGroup>
-
-    <ItemGroup>
+        <Compile Include="src/FSharpConverters.fs" />
         <Compile Include="src/Util.fs" />
         <Compile Include="src/ArraySet.fs" />
         <Compile Include="src/MappingList.fs" />

@@ -18,12 +18,15 @@ module Util =
             file: string option
             sourcesContent: seq<string option> option
             sourceRoot: string option }
+
+#if !FABLE_COMPILER
         /// Render the source map being generated to a string.
         member this.Serialize() =
             System.Text.Json.JsonSerializer.Serialize(this, System.Text.Json.FSharpConverters.Options)
         /// Write the source map being generated to a stream.
         member this.SerializeAsync stream =
             System.Text.Json.JsonSerializer.SerializeAsync(stream, this, System.Text.Json.FSharpConverters.Options)
+#endif
 
     type RawSection = {
         offset: MappingIndex
