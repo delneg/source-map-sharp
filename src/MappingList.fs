@@ -13,24 +13,24 @@ module MappingList =
       || (lineB = lineA && columnB >= columnA)
       || compareByGeneratedPositionsInflated mappingA mappingB <= 0 
 
-type MappingList() as this =
-    member val _array = ResizeArray<Mapping>()
-    member val _sorted = true with get,set
-    member val _last = {Generated = {line = -1; column = 0};Original=None;Source = None;Name=None} with get,set
+type MappingList() =
+    let _array = ResizeArray<Mapping>()
+    let mutable _sorted = true
+    let mutable _last = {Generated = {line = -1; column = 0};Original=None;Source = None;Name=None}
 
     member _.UnsortedForEach(aCallback) =
-        this._array.ForEach(aCallback)
+        _array.ForEach(aCallback)
 
     member _.Add(aMapping: Mapping) =
-        if MappingList.generatedPositionAfter this._last aMapping then
-            this._last <- aMapping
-            this._array.Add(aMapping)
+        if MappingList.generatedPositionAfter _last aMapping then
+            _last <- aMapping
+            _array.Add(aMapping)
         else
-            this._sorted <- false
-            this._array.Add(aMapping)
+            _sorted <- false
+            _array.Add(aMapping)
 
     member _.ToArray() =
-        if not this._sorted then
-            this._array.Sort(MappingComparer())
-            this._sorted <- true
-        this._array
+        if not _sorted then
+            _array.Sort(MappingComparer())
+            _sorted <- true
+        _array
