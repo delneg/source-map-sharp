@@ -135,7 +135,7 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
         let mutable previousOriginalLine = 0
         let mutable previousName = 0;
         let mutable previousSource = 0
-        let mutable result = ""
+        let result = System.Text.StringBuilder()
         let mutable next = ""
         let mutable nameIdx = 0
         let mutable sourceIdx  = 0
@@ -186,5 +186,5 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
                             next <- next + Base64Vlq.Encode (nameIdx - previousName)
                             previousName <- nameIdx
                         )
-                result <- result + next
-        result
+                result.Append(next) |> ignore
+        result.ToString()
