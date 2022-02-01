@@ -4,7 +4,7 @@ open SourceMapSharp.Util
 
 module MappingList =
 
-    let generatedPositionAfter (mappingA:Mapping) (mappingB:Mapping) =
+    let inline generatedPositionAfter (mappingA:Mapping) (mappingB:Mapping) =
       let lineA = mappingA.Generated.line
       let lineB = mappingB.Generated.line
       let columnA = mappingA.Generated.column
@@ -31,6 +31,6 @@ type MappingList() =
 
     member _.ToArray() =
         if not _sorted then
-            _array.Sort(MappingComparer())
+            _array.Sort(sharedMappingComparer)
             _sorted <- true
         _array
