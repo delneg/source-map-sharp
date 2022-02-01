@@ -135,8 +135,8 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
         let mutable previousOriginalLine = 0
         let mutable previousName = 0;
         let mutable previousSource = 0
-        let mutable result = ""
-        let mutable next = ""
+        let result = System.Text.StringBuilder()
+        let mutable next = System.Text.StringBuilder()
         let mutable nameIdx = 0
         let mutable sourceIdx  = 0
         let mappings = _mappings.ToArray()
@@ -144,11 +144,11 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
             // hack for 'continue' keyword in JS
             let mutable shouldContinue = false
             let mapping = mappings.[i]
-            next <- ""
+            next <- System.Text.StringBuilder()
             if mapping.Generated.line <> previousGeneratedLine then
                 previousGeneratedColumn <- 0
                 while mapping.Generated.line <> previousGeneratedLine do
-                    next <- next + ";"
+                    next.Append(";") |> ignore
                     previousGeneratedLine <- previousGeneratedLine + 1
             elif i > 0 then
                 let compared = compareByGeneratedPositionsInflated mapping mappings.[i-1]
@@ -156,35 +156,35 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
                     // JS has 'continue' here, which we're emulating with a mutable bool
                     shouldContinue <- true
                 else
-                    next <- next + ","
+                    next.Append(",") |> ignore
             if not shouldContinue then
-                next <- next + Base64Vlq.Encode (mapping.Generated.column - previousGeneratedColumn)
+                next.Append(Base64Vlq.Encode (mapping.Generated.column - previousGeneratedColumn)) |> ignore
                 previousGeneratedColumn <- mapping.Generated.column
                 if mapping.Source.IsSome then
                     mapping.Source
-                    |> Option.bind (fun x -> this._sources.indexOf x)
+                    |> Option.bind (this._sources.indexOf)
                     |> Option.iter (fun indexOfMappingSource ->
                         sourceIdx <- indexOfMappingSource
-                        next <- next + Base64Vlq.Encode (sourceIdx - previousSource)
+                        next.Append(Base64Vlq.Encode (sourceIdx - previousSource)) |> ignore
                         previousSource <- sourceIdx
                     )
                     // lines are stored 0-based in SourceMap spec version 3
                     mapping.Original
                     |> Option.iter (fun original ->
-                        next <- next + Base64Vlq.Encode (original.line - 1 - previousOriginalLine)
+                        next.Append(Base64Vlq.Encode (original.line - 1 - previousOriginalLine)) |> ignore
                         previousOriginalLine <- original.line - 1
 
-                        next <- next + Base64Vlq.Encode (original.column - previousOriginalColumn)
+                        next.Append(Base64Vlq.Encode (original.column - previousOriginalColumn)) |> ignore
                         previousOriginalColumn <- original.column
                     )
 
                     if mapping.Name.IsSome then
                         mapping.Name
-                        |> Option.bind (fun x -> _names.indexOf x)
+                        |> Option.bind (_names.indexOf)
                         |> Option.iter (fun indexOfMappingName ->
                             nameIdx <- indexOfMappingName
-                            next <- next + Base64Vlq.Encode (nameIdx - previousName)
+                            next.Append(Base64Vlq.Encode (nameIdx - previousName)) |> ignore
                             previousName <- nameIdx
                         )
-                result <- result + next
-        result
+                result.Append(next.ToString()) |> ignore
+        result.ToString()
