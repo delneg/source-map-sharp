@@ -6,6 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Util.fs" />
+        <Compile Include="Base64.fs" />
         <Compile Include="Tests.fs" />
     </ItemGroup>
 
@@ -13,6 +15,6 @@
         <ProjectReference Include="..\source-map-sharp.fsproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Fable.Mocha" Version="1.1.0" />
+        <PackageReference Include="Fable.Mocha" Version="2.11.0" />
     </ItemGroup>
 </Project>

@@ -32,11 +32,23 @@ module Base64 =
         if (0 <= c && c < intToCharMap.Length) then
             intToCharMap.[c]
         else
+           #if FABLE_COMPILER
+           failwith $"Must be between 0 and 63: {c}"
+           #else
            raise (VlqException("Must be between 0 and 63: " + string c) :> System.Exception)
+           #endif
+           
+           
     let base64Decode(c: char) =
         let index = Array.IndexOf(intToCharMap,c)
         if index > -1 then index
-        else raise (VlqException("Not a valid base 64 digit: " + string c))
+        else
+            #if FABLE_COMPILER
+           failwith $"Not a valid base 64 digit: {c}"
+           #else
+            raise (VlqException("Not a valid base 64 digit: " + string c))
+           #endif
+           
 
 type Base64Vlq() =
     // A single base 64 digit can contain 6 bits of data. For the base 64 variable
