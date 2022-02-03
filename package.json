@@ -2,7 +2,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "fable": "dotnet run -c Release -p ../Fable/src/Fable.Cli -- source-map-sharp.fsproj --outDir build",
-    "test": "dotnet test"
+    "fable": "dotnet fable source-map-sharp.fsproj --outDir build",
+    "pretest": "dotnet fable Tests.Fable/Tests.Fable.fsproj --outDir build/tests/",
+    "test": "mocha build/tests/Tests.js"
+  },
+  "devDependencies": {
+    "mocha": "^9.2.0"
   }
 }
