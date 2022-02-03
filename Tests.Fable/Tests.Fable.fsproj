@@ -9,6 +9,7 @@
         <Compile Include="Util.fs" />
         <Compile Include="Base64.fs" />
         <Compile Include="ArraySet.fs" />
+        <Compile Include="SourceMapGenerator.fs" />
         <Compile Include="Tests.fs" />
     </ItemGroup>
 
@@ -17,5 +18,6 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Fable.Mocha" Version="2.11.0" />
+        <PackageReference Include="Fable.SimpleJson" Version="3.22.0" />
     </ItemGroup>
 </Project>

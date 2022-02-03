@@ -8,4 +8,5 @@ let _ =
         Tests.Util.utilTests
         Tests.Base64.base64Tests
         Tests.ArraySet.arraySetTests
+        Tests.SourceMapGenerator.sourceMapGeneratorTests
     |] |> Array.map Mocha.runTests

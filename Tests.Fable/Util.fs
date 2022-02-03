@@ -3,14 +3,18 @@ module Tests.Util
 open Fable.Mocha
 open SourceMapSharp
 open SourceMapSharp.Util
-
+open Fable.SimpleJson
 type TestUtils =
   static member assertEqualSourceMaps(s1:SourceMapGenerator,s2:SourceMapGenerator) =
-    Expect.equal (s1.ToString()) (s2.ToString()) "sourcemaps not equal"
+    let serialized1 = Json.serialize (s1.toJSON())
+    let serialized2 = Json.serialize (s2.toJSON())
+    Expect.equal serialized1 serialized2 "sourcemaps not equal"
   
-//  static member assertEqualSourceMaps(s1:SourceMapGenerator,s2:SourceGeneratorJSON) =
-//     Expect.equal (s1.ToString()) (s2.Serialize()) "source map json not equal"
-//     
+  static member assertEqualSourceMaps(s1:SourceMapGenerator,s2:SourceGeneratorJSON) =
+     let serialized2 = Json.serialize s2
+     let serialized1 = Json.serialize (s1.toJSON())
+     Expect.equal serialized1 serialized2 "source map json not equal"
+   
 let utilTests =
     testList "Util" [
           testCase "test relative()" <| fun () ->
