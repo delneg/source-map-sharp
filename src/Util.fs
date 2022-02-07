@@ -5,7 +5,6 @@ module Util =
     [<Struct>]
     type MappingIndex = {line: int; column: int}
     
-    [<Struct>]
     type Mapping = {
         Generated: MappingIndex
         Original: MappingIndex option
