@@ -1,4 +1,4 @@
-module Tests.Base64
+module Tests_Fable.Base64
 
 open Fable.Core
 open Fable.Mocha

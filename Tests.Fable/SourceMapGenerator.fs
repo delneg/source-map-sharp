@@ -1,8 +1,9 @@
-module Tests.SourceMapGenerator
+module Tests_Fable.SourceMapGenerator
 open Fable.Mocha
 open Fable.SimpleJson
 open SourceMapSharp
 open SourceMapSharp.Util
+open Tests_Fable.Util
 let testMap: SourceGeneratorJSON = {
      version=3
      file="min.js"|>Some
@@ -124,7 +125,7 @@ let sourceMapGeneratorTests =
             let original: MappingIndex = { line= 2; column= 10 }
             map.AddMapping(generated, original, "two.js", "n")
             
-            Tests.Util.TestUtils.assertEqualSourceMaps(map,testMap)
+            TestUtils.assertEqualSourceMaps(map,testMap)
             
             
         
@@ -177,7 +178,7 @@ let sourceMapGeneratorTests =
                  sourcesContent=None
                  sourceRoot=None
                 }
-            Tests.Util.TestUtils.assertEqualSourceMaps(map,expected)
+            TestUtils.assertEqualSourceMaps(map,expected)
         
         testCase "test ignore duplicate mappings." <| fun () ->
             let map1 = SourceMapGenerator(file="min.js",sourceRoot="/the/root")
@@ -191,14 +192,14 @@ let sourceMapGeneratorTests =
             
             map2.AddMapping(nullMapping1)
             
-            Tests.Util.TestUtils.assertEqualSourceMaps(map1,map2)
+            TestUtils.assertEqualSourceMaps(map1,map2)
                     
             map1.AddMapping(nullMapping2)
             map1.AddMapping(nullMapping1)
 
             map2.AddMapping(nullMapping2)
             
-            Tests.Util.TestUtils.assertEqualSourceMaps(map1,map2)
+            TestUtils.assertEqualSourceMaps(map1,map2)
             
             let srcMapping1Generated: MappingIndex = { line= 1; column= 0 }
             let srcMapping1Original: MappingIndex = { line= 11; column= 0 }
@@ -216,14 +217,14 @@ let sourceMapGeneratorTests =
             
             map2.AddMapping(srcMapping1Generated,srcMapping1Original,srcMapping1Source)
             
-            Tests.Util.TestUtils.assertEqualSourceMaps(map1,map2)
+            TestUtils.assertEqualSourceMaps(map1,map2)
             
             map1.AddMapping(srcMapping2Generated,srcMapping2Original,srcMapping2Source)
             map1.AddMapping(srcMapping1Generated,srcMapping1Original,srcMapping1Source)
             
             map2.AddMapping(srcMapping2Generated,srcMapping2Original,srcMapping2Source)
             
-            Tests.Util.TestUtils.assertEqualSourceMaps(map1,map2)
+            TestUtils.assertEqualSourceMaps(map1,map2)
             
             
             let fullMapping1Generated: MappingIndex = { line= 1; column= 0 }
@@ -244,13 +245,13 @@ let sourceMapGeneratorTests =
             
             map2.AddMapping(fullMapping1Generated,fullMapping1Original,fullMapping1Source,fullMapping1Name)
             
-            Tests.Util.TestUtils.assertEqualSourceMaps(map1,map2)
+            TestUtils.assertEqualSourceMaps(map1,map2)
             
             map1.AddMapping(fullMapping2Generated,fullMapping2Original,fullMapping2Source,fullMapping2Name)
             map1.AddMapping(fullMapping1Generated,fullMapping1Original,fullMapping1Source,fullMapping1Name)
             
             map2.AddMapping(fullMapping2Generated,fullMapping2Original,fullMapping2Source,fullMapping2Name)
-            Tests.Util.TestUtils.assertEqualSourceMaps(map1,map2)
+            TestUtils.assertEqualSourceMaps(map1,map2)
             
             
         
@@ -273,7 +274,7 @@ let sourceMapGeneratorTests =
                  sourcesContent=None
                  sourceRoot=None
                 }
-            Tests.Util.TestUtils.assertEqualSourceMaps(map,expected)
+            TestUtils.assertEqualSourceMaps(map,expected)
             
         
         testCase "test setting sourcesContent to null when already null" <| fun () ->

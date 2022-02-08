@@ -1,4 +1,4 @@
-module Tests.Util
+module Tests_Fable.Util
 
 open Fable.Mocha
 open SourceMapSharp

@@ -1,4 +1,4 @@
-module Tests.ArraySet
+module Tests_Fable.ArraySet
 
 open Fable.Mocha
 open SourceMapSharp

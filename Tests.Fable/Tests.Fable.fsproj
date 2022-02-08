@@ -10,6 +10,7 @@
         <Compile Include="Base64.fs" />
         <Compile Include="ArraySet.fs" />
         <Compile Include="SourceMapGenerator.fs" />
+        <Compile Include="SourceNode.fs" />
         <Compile Include="Tests.fs" />
     </ItemGroup>
 

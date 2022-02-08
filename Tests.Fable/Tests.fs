@@ -1,12 +1,11 @@
-module Tests
 
 open Fable.Mocha
-open SourceMapSharp
 
 let _ = 
     [|
-        Tests.Util.utilTests
-        Tests.Base64.base64Tests
-        Tests.ArraySet.arraySetTests
-        Tests.SourceMapGenerator.sourceMapGeneratorTests
+        Tests_Fable.Util.utilTests
+        Tests_Fable.Base64.base64Tests
+        Tests_Fable.ArraySet.arraySetTests
+        Tests_Fable.SourceMapGenerator.sourceMapGeneratorTests
+        Tests_Fable.SourceNode.sourceNodeTests
     |] |> Array.map Mocha.runTests
