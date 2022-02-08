@@ -12,6 +12,11 @@ See https://github.com/fable-compiler/Fable/issues/2166 - "Bring back source map
 UPD: The issue above was closed, and this project is now being used by Fable to generated Source Maps. Hooray!
 
 
+### Current support status
+
++ Fable - working fine
++ .NET - working fine
+
 ### Running tests
 
 dotnet:
