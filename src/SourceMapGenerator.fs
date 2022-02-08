@@ -71,7 +71,6 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
 
     member this.GenerateSourcesContent(aSources, aSourceRoot: string option) =
         aSources
-        |> Array.ofSeq
         |> Seq.map (fun source ->
             if this._sourcesContents.Keys.Count = 0 then
                 None

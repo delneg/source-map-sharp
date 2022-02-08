@@ -4,6 +4,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "source-map-sharp", "source-
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "Tests\Tests.fsproj", "{404823EE-969B-4148-AE36-2BC09FE3C201}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks", "Benchmarks\Benchmarks.fsproj", "{CF8855C0-D02D-4C7F-B72B-CBD08ADCD687}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests.Fable", "Tests.Fable\Tests.Fable.fsproj", "{BFFCA172-AD6B-4933-ACF2-F251CC3F507E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{404823EE-969B-4148-AE36-2BC09FE3C201}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{404823EE-969B-4148-AE36-2BC09FE3C201}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{404823EE-969B-4148-AE36-2BC09FE3C201}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF8855C0-D02D-4C7F-B72B-CBD08ADCD687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF8855C0-D02D-4C7F-B72B-CBD08ADCD687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF8855C0-D02D-4C7F-B72B-CBD08ADCD687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF8855C0-D02D-4C7F-B72B-CBD08ADCD687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFFCA172-AD6B-4933-ACF2-F251CC3F507E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFFCA172-AD6B-4933-ACF2-F251CC3F507E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFFCA172-AD6B-4933-ACF2-F251CC3F507E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFFCA172-AD6B-4933-ACF2-F251CC3F507E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

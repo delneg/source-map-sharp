@@ -4,26 +4,6 @@ open SourceMapSharp
 open Xunit
 
 module Base64Tests =
-    [<Fact>]
-    let ``Base64 encode test out of range encoding`` () =
-        let action =
-            Action(fun _ -> Base64.base64Encode -1 |> ignore)
-
-        Assert.Throws(VlqException().GetType(), action)
-
-    [<Fact>]
-    let ``Base64 encode test out of range encoding#2`` () =
-        let action =
-            Action(fun _ -> Base64.base64Encode 64 |> ignore)
-
-        Assert.Throws(VlqException().GetType(), action)
-
-    [<Fact>]
-    let ``test normal encoding and decoding`` () =
-        for i in [ 0 .. 63 ] do
-            Base64.base64Encode i |> ignore
-
-
     let vlqs =
         [| (-255, "/P")
            (-254, "9P")
@@ -532,6 +512,25 @@ module Base64Tests =
            (253, "6P")
            (254, "8P")
            (255, "+P") |]
+        
+    [<Fact>]
+    let ``Base64 encode test out of range encoding`` () =
+        let action =
+            Action(fun _ -> Base64.base64Encode -1 |> ignore)
+
+        Assert.Throws(VlqException().GetType(), action)
+
+    [<Fact>]
+    let ``Base64 encode test out of range encoding#2`` () =
+        let action =
+            Action(fun _ -> Base64.base64Encode 64 |> ignore)
+
+        Assert.Throws(VlqException().GetType(), action)
+
+    [<Fact>]
+    let ``test normal encoding and decoding`` () =
+        for i in [ 0 .. 63 ] do
+            Base64.base64Encode i |> ignore
 
 
     [<Fact>]

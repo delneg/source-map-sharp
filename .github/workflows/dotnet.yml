@@ -22,8 +22,8 @@ jobs:
       with:
           dotnet-version: ${{ matrix.dotnet }}
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore Tests/Tests.fsproj
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore Tests/Tests.fsproj
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal Tests/Tests.fsproj

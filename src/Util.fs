@@ -2,7 +2,9 @@ namespace SourceMapSharp
 open System.Collections.Generic
 
 module Util =
+    [<Struct>]
     type MappingIndex = {line: int; column: int}
+    
     type Mapping = {
         Generated: MappingIndex
         Original: MappingIndex option
@@ -41,10 +43,10 @@ module Util =
         sections: seq<RawSection>
     }
 
-    let strcmp (s1: string option) (s2:string option) =
+    let inline strcmp (s1: string option) (s2:string option) =
         if s1.IsSome && s2.IsSome then
-            if s1 = s2 then 0
-            elif s1 > s2 then 1
+            if s1.Value = s2.Value then 0
+            elif s1.Value > s2.Value then 1
             else -1
         elif s1.IsNone && s2.IsNone then
             0
@@ -52,7 +54,7 @@ module Util =
         elif s2.IsNone then -1
         else -1
 
-    let compareByGeneratedPositionsInflated (mappingA: Mapping) (mappingB: Mapping) =
+    let inline compareByGeneratedPositionsInflated (mappingA: Mapping) (mappingB: Mapping) =
         let mutable cmp = mappingA.Generated.line - mappingB.Generated.line
         if cmp <> 0 then cmp
         else
@@ -153,6 +155,8 @@ module Util =
         //TODO
         sourceUrl
 
-    type MappingComparer() =
+    
+    type _MappingComparer() =
         interface IComparer<Mapping> with
             member _.Compare(a,b) = compareByGeneratedPositionsInflated a b
+    let sharedMappingComparer = _MappingComparer()
