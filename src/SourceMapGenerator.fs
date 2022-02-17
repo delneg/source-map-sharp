@@ -135,7 +135,7 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
         let mutable previousName = 0;
         let mutable previousSource = 0
         let result = System.Text.StringBuilder()
-        let mutable next = System.Text.StringBuilder()
+        let next = System.Text.StringBuilder()
         let mutable nameIdx = 0
         let mutable sourceIdx  = 0
         let mappings = _mappings.ToArray()
@@ -143,7 +143,7 @@ type SourceMapGenerator(?skipValidation:bool, ?file:string, ?sourceRoot:string) 
             // hack for 'continue' keyword in JS
             let mutable shouldContinue = false
             let mapping = mappings.[i]
-            next <- System.Text.StringBuilder()
+            next.Clear() |> ignore
             if mapping.Generated.line <> previousGeneratedLine then
                 previousGeneratedColumn <- 0
                 while mapping.Generated.line <> previousGeneratedLine do
